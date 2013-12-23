@@ -29,7 +29,7 @@ namespace GameOfLifeTests
         public void NewBoardIsAllDead()
         {
             var board = new GameOfLifeBoard(5);
-            Assert.IsTrue(board.IsAllDead());
+            Assert.AreEqual(0, board.LiveCount);
         }
 
         [TestMethod]
@@ -37,7 +37,18 @@ namespace GameOfLifeTests
         {
             var board = new GameOfLifeBoard(5);
             var nextGenBoard = board.NextGenerationBoard();
-            Assert.IsTrue(nextGenBoard.IsAllDead());
+            Assert.AreEqual(0, nextGenBoard.LiveCount);
         }
+
+        [TestMethod]
+        public void NextGenerationOfABoardWithASingleLiveCellIsAllDead()
+        {
+            var board = new GameOfLifeBoard(5);
+            Assert.AreEqual(0, board.LiveCount);
+            board.SetCell(2, 2);
+            Assert.AreEqual(1, board.LiveCount);
+            Assert.AreEqual(0, board.NextGenerationBoard().LiveCount);            
+        }
+
     }
 }

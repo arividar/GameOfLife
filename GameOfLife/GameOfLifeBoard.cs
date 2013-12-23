@@ -19,6 +19,19 @@
             get { return _board.GetUpperBound(0)+1; }
         }
 
+        public int LiveCount
+        {
+            get
+            {
+                int liveCount = 0;
+                for (int i = 0; i < Size; i++)
+                    for (int h = 0; h < Size; h++)
+                        if (_board[i, h] == CellStatus.Alive)
+                            liveCount++;
+                return liveCount;
+            }
+        }
+
         public void SetCell(int x, int y)
         {
             _board[x, y] = CellStatus.Alive;
@@ -29,19 +42,10 @@
             return _board[x, y];
         }
 
-        public bool IsAllDead()
-        {
-            bool isEmpty = true;
-            for (int i = 0; i < Size; i++)
-                for (int h = 0; h < Size; h++)
-                    if (_board[i, h] == CellStatus.Alive)
-                        isEmpty = false;
-            return isEmpty;
-        }
-
         public GameOfLifeBoard NextGenerationBoard()
         {
-            return this;
+            var nextGenBoard = new GameOfLifeBoard(Size);            
+            return nextGenBoard;
         }
     }
 }
