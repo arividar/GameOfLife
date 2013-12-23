@@ -10,7 +10,7 @@ namespace GameOfLifeTests
         public void CreateBoardShouldBeCorrectSize()
         {
             var board = new GameOfLifeBoard(10);
-            Assert.AreEqual(10 * 10, board.Size);
+            Assert.AreEqual(10, board.Size);
         }
 
         [TestMethod]
@@ -23,6 +23,21 @@ namespace GameOfLifeTests
             board.SetCell(3, 5);
             c = board.GetCell(3, 5);
             Assert.AreEqual(CellStatus.Alive, c);
+        }
+
+        [TestMethod]
+        public void NewBoardIsAllDead()
+        {
+            var board = new GameOfLifeBoard(5);
+            Assert.IsTrue(board.IsAllDead());
+        }
+
+        [TestMethod]
+        public void NextGenerationOfEmptyBoardIsAllDead()
+        {
+            var board = new GameOfLifeBoard(5);
+            var nextGenBoard = board.NextGenerationBoard();
+            Assert.IsTrue(nextGenBoard.IsAllDead());
         }
     }
 }

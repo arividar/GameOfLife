@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameOfLife
+﻿namespace GameOfLife
 {
     public enum CellStatus { Alive, Dead }
 
@@ -22,7 +16,7 @@ namespace GameOfLife
 
         public int Size
         {
-            get { return _board.Length; }
+            get { return _board.GetUpperBound(0)+1; }
         }
 
         public void SetCell(int x, int y)
@@ -33,6 +27,21 @@ namespace GameOfLife
         public CellStatus GetCell(int x, int y)
         {
             return _board[x, y];
+        }
+
+        public bool IsAllDead()
+        {
+            bool isEmpty = true;
+            for (int i = 0; i < Size; i++)
+                for (int h = 0; h < Size; h++)
+                    if (_board[i, h] == CellStatus.Alive)
+                        isEmpty = false;
+            return isEmpty;
+        }
+
+        public GameOfLifeBoard NextGenerationBoard()
+        {
+            return this;
         }
     }
 }
