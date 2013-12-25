@@ -61,7 +61,9 @@
         private CellStatus NextGenerationCell(int x, int y)
         {
             int liveNeighbours = LiveNeighbourCount(x, y);
-            return (liveNeighbours < 2) || (liveNeighbours > 3) ? CellStatus.Dead : _board[x, y];
+            if ((liveNeighbours < 2) || (liveNeighbours > 3))
+                return CellStatus.Dead;
+            return _board[x, y];
         }
 
         private int LiveNeighbourCount(int x, int y)
