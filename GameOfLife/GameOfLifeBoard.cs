@@ -63,10 +63,12 @@
             int liveNeighbours = LiveNeighbourCount(x, y);
             if ((liveNeighbours < 2) || (liveNeighbours > 3))
                 return CellStatus.Dead;
+            if (liveNeighbours == 3)
+                return CellStatus.Alive;
             return _board[x, y];
         }
 
-        private int LiveNeighbourCount(int x, int y)
+        public int LiveNeighbourCount(int x, int y)
         {
             return OneIfAlive(x-1, y-1) +
                    OneIfAlive(x,   y-1) +
