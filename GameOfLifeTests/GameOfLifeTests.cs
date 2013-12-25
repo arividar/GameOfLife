@@ -91,6 +91,25 @@ namespace GameOfLifeTests
         }
 
         [TestMethod]
+        public void LiveCellWithTwoOrThreeLiveNeighboursLives()
+        {
+            var board = new GameOfLifeBoard(5);
+            Assert.AreEqual(0, board.LiveCount);
+            board.SetAlive(1, 3);
+            board.SetAlive(2, 2);
+            board.SetAlive(2, 3);
+            board.SetAlive(2, 4);
+            board.SetAlive(3, 2);
+            Assert.IsTrue(board.IsCellAlive(1, 3));
+            Assert.AreEqual(3, board.LiveNeighbourCount(1, 3));
+            Assert.IsTrue(board.IsCellAlive(3, 2));
+            Assert.AreEqual(2, board.LiveNeighbourCount(3, 2));
+            var nextBoard = board.NextGenerationBoard();
+            Assert.IsTrue(nextBoard.IsCellAlive(1, 3) && nextBoard.IsCellAlive(3, 2));
+        }
+
+
+        [TestMethod]
         public void DeadCellWithExactlyThreeLiveNeighboursBecomesAlive()
         {
             var board = new GameOfLifeBoard(5);
@@ -99,8 +118,8 @@ namespace GameOfLifeTests
             board.SetAlive(2, 3);
             board.SetAlive(2, 4);
             Assert.IsFalse(board.IsCellAlive(3, 3));
-            Assert.AreEqual(3, board.LiveNeighbourCount(3,3));
-            Assert.IsTrue(board.NextGenerationBoard().IsCellAlive(3,3));
+            Assert.AreEqual(3, board.LiveNeighbourCount(3, 3));
+            Assert.IsTrue(board.NextGenerationBoard().IsCellAlive(3, 3));
         }
 
     }
