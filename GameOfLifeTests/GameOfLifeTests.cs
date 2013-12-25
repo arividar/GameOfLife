@@ -71,6 +71,7 @@ namespace GameOfLifeTests
             board.SetAlive(2, 3);
             board.SetAlive(2, 4);
             var nextBoard = board.NextGenerationBoard();
+            Assert.IsTrue(board.LiveNeighbourCount(2, 4) < 2 && board.LiveNeighbourCount(2, 2) < 2 && board.LiveNeighbourCount(0, 0) < 2);
             Assert.IsFalse(nextBoard.IsCellAlive(2, 4) || nextBoard.IsCellAlive(2, 2) || nextBoard.IsCellAlive(0, 0));
         }
 
