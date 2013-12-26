@@ -35,9 +35,9 @@ namespace GameOfLife
         private static void PrintBoard(int generation, GameOfLifeBoard board)
         {
             Console.WriteLine("Generation: "+generation.ToString(CultureInfo.InvariantCulture));
-            for (int x = 0; x < board.Size - 1; x++)
+            for (int x = 0; x < board.Size; x++)
             {
-                for (int y = 0; y < board.Size - 1; y++)
+                for (int y = 0; y < board.Size; y++)
                 { 
                     Console.Write(board.GetCell(x, y) == CellStatus.Dead ? " . " : " X ");
                 }
@@ -50,7 +50,7 @@ namespace GameOfLife
         {
             var board = new GameOfLifeBoard(10);
             SetGenerationZero(board);
-            for (int i = 0; i <= 31; i++)
+            for (int i = 0; i <= 25; i++)
             {
                 PrintBoard(i, board);
                 board = board.NextGenerationBoard();
