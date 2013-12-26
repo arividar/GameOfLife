@@ -7,29 +7,29 @@ namespace GameOfLife
     {
         private static void SetGenerationZero(GameOfLifeBoard theBoard)
         {
-            theBoard.SetAlive(1, 0);
-            theBoard.SetAlive(1, 1);
-            theBoard.SetAlive(1, 2);
-            theBoard.SetAlive(1, 3);
-            theBoard.SetAlive(2, 0);
-            theBoard.SetAlive(2, 1);
-            theBoard.SetAlive(2, 2);
-            theBoard.SetAlive(2, 3);
-            theBoard.SetAlive(3, 4);
-            theBoard.SetAlive(3, 5);
-            theBoard.SetAlive(6, 2);
-            theBoard.SetAlive(6, 3);
-            theBoard.SetAlive(6, 4);
-            theBoard.SetAlive(7, 2);
-            theBoard.SetAlive(7, 3);
-            theBoard.SetAlive(8, 4);
-            theBoard.SetAlive(8, 5);
-            theBoard.SetAlive(9, 4);
-            theBoard.SetAlive(9, 5);
-            theBoard.SetAlive(9, 6);
-            theBoard.SetAlive(9, 7);
-            theBoard.SetAlive(9, 8);
-            theBoard.SetAlive(9, 9);
+            theBoard.SetCellAlive(1, 0);
+            theBoard.SetCellAlive(1, 1);
+            theBoard.SetCellAlive(1, 2);
+            theBoard.SetCellAlive(1, 3);
+            theBoard.SetCellAlive(2, 0);
+            theBoard.SetCellAlive(2, 1);
+            theBoard.SetCellAlive(2, 2);
+            theBoard.SetCellAlive(2, 3);
+            theBoard.SetCellAlive(3, 4);
+            theBoard.SetCellAlive(3, 5);
+            theBoard.SetCellAlive(6, 2);
+            theBoard.SetCellAlive(6, 3);
+            theBoard.SetCellAlive(6, 4);
+            theBoard.SetCellAlive(7, 2);
+            theBoard.SetCellAlive(7, 3);
+            theBoard.SetCellAlive(8, 4);
+            theBoard.SetCellAlive(8, 5);
+            theBoard.SetCellAlive(9, 4);
+            theBoard.SetCellAlive(9, 5);
+            theBoard.SetCellAlive(9, 6);
+            theBoard.SetCellAlive(9, 7);
+            theBoard.SetCellAlive(9, 8);
+            theBoard.SetCellAlive(9, 9);
         }
 
         private static void PrintBoard(int generation, GameOfLifeBoard board)

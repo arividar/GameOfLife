@@ -32,7 +32,7 @@
             }
         }
 
-        public void SetAlive(int x, int y)
+        public void SetCellAlive(int x, int y)
         {
             _board[x, y] = CellStatus.Alive;
         }

@@ -20,7 +20,7 @@ namespace GameOfLifeTests
             var c = board.GetCell(3, 5);
             Assert.AreEqual(CellStatus.Dead, c);
 
-            board.SetAlive(3, 5);
+            board.SetCellAlive(3, 5);
             c = board.GetCell(3, 5);
             Assert.AreEqual(CellStatus.Alive, c);
         }
@@ -45,7 +45,7 @@ namespace GameOfLifeTests
         {
             var board = new GameOfLifeBoard(5);
             Assert.AreEqual(0, board.LiveCount);
-            board.SetAlive(2, 2);
+            board.SetCellAlive(2, 2);
             Assert.AreEqual(1, board.LiveCount);
             Assert.AreEqual(0, board.NextGenerationBoard().LiveCount);            
         }
@@ -55,9 +55,9 @@ namespace GameOfLifeTests
         {
             var board = new GameOfLifeBoard(5);
             Assert.AreEqual(0, board.LiveCount);
-            board.SetAlive(2, 2);
-            board.SetAlive(2, 3);
-            board.SetAlive(2, 4);
+            board.SetCellAlive(2, 2);
+            board.SetCellAlive(2, 3);
+            board.SetCellAlive(2, 4);
             Assert.IsTrue(board.NextGenerationBoard().IsCellAlive(2, 3));            
         }
 
@@ -66,10 +66,10 @@ namespace GameOfLifeTests
         {
             var board = new GameOfLifeBoard(5);
             Assert.AreEqual(0, board.LiveCount);
-            board.SetAlive(0, 0);
-            board.SetAlive(2, 2);
-            board.SetAlive(2, 3);
-            board.SetAlive(2, 4);
+            board.SetCellAlive(0, 0);
+            board.SetCellAlive(2, 2);
+            board.SetCellAlive(2, 3);
+            board.SetCellAlive(2, 4);
             var nextBoard = board.NextGenerationBoard();
             Assert.IsTrue(board.LiveNeighbourCount(2, 4) < 2 && board.LiveNeighbourCount(2, 2) < 2 && board.LiveNeighbourCount(0, 0) < 2);
             Assert.IsFalse(nextBoard.IsCellAlive(2, 4) || nextBoard.IsCellAlive(2, 2) || nextBoard.IsCellAlive(0, 0));
@@ -80,12 +80,12 @@ namespace GameOfLifeTests
         {
             var board = new GameOfLifeBoard(5);
             Assert.AreEqual(0, board.LiveCount);
-            board.SetAlive(1, 3);
-            board.SetAlive(2, 2);
-            board.SetAlive(2, 3);
-            board.SetAlive(2, 4);
-            board.SetAlive(3, 3);
-            board.SetAlive(3, 4);
+            board.SetCellAlive(1, 3);
+            board.SetCellAlive(2, 2);
+            board.SetCellAlive(2, 3);
+            board.SetCellAlive(2, 4);
+            board.SetCellAlive(3, 3);
+            board.SetCellAlive(3, 4);
             var nextBoard = board.NextGenerationBoard();
             Assert.IsFalse(nextBoard.IsCellAlive(2, 3) || nextBoard.IsCellAlive(2, 4));
         }
@@ -95,11 +95,11 @@ namespace GameOfLifeTests
         {
             var board = new GameOfLifeBoard(5);
             Assert.AreEqual(0, board.LiveCount);
-            board.SetAlive(1, 3);
-            board.SetAlive(2, 2);
-            board.SetAlive(2, 3);
-            board.SetAlive(2, 4);
-            board.SetAlive(3, 2);
+            board.SetCellAlive(1, 3);
+            board.SetCellAlive(2, 2);
+            board.SetCellAlive(2, 3);
+            board.SetCellAlive(2, 4);
+            board.SetCellAlive(3, 2);
             Assert.IsTrue(board.IsCellAlive(1, 3));
             Assert.AreEqual(3, board.LiveNeighbourCount(1, 3));
             Assert.IsTrue(board.IsCellAlive(3, 2));
@@ -114,9 +114,9 @@ namespace GameOfLifeTests
         {
             var board = new GameOfLifeBoard(5);
             Assert.AreEqual(0, board.LiveCount);
-            board.SetAlive(2, 2);
-            board.SetAlive(2, 3);
-            board.SetAlive(2, 4);
+            board.SetCellAlive(2, 2);
+            board.SetCellAlive(2, 3);
+            board.SetCellAlive(2, 4);
             Assert.IsFalse(board.IsCellAlive(3, 3));
             Assert.AreEqual(3, board.LiveNeighbourCount(3, 3));
             Assert.IsTrue(board.NextGenerationBoard().IsCellAlive(3, 3));
