@@ -41,6 +41,16 @@ namespace GameOfLifeTests
         }
 
         [TestMethod]
+        public void LiveCountIsTwoForTwoLiveCells()
+        {
+            var board = new GameOfLifeBoard(5);
+            Assert.AreEqual(0, board.LiveCount);
+            board.SetCellAlive(2, 2);
+            board.SetCellAlive(2, 3);
+            Assert.AreEqual(2, board.LiveCount);
+        }
+
+        [TestMethod]
         public void NextGenerationOfABoardWithASingleLiveCellIsAllDead()
         {
             var board = new GameOfLifeBoard(5);

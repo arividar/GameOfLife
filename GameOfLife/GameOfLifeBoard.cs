@@ -6,17 +6,12 @@
     {
         private readonly CellStatus[,] _board;
 
-        public GameOfLifeBoard(int size)
-        {
-            _board = new CellStatus[size, size];
-            for (int i = 0; i < size; i++)
-                for (int h = 0; h < size; h++)
-                    _board[i, h] = CellStatus.Dead;
-        }
-
         public int Size
         {
-            get { return _board.GetUpperBound(0)+1; }
+            get
+            {
+                return _board.GetUpperBound(0) + 1;
+            }
         }
 
         public int LiveCount
@@ -30,6 +25,14 @@
                             liveCount++;
                 return liveCount;
             }
+        }
+
+        public GameOfLifeBoard(int size)
+        {
+            _board = new CellStatus[size, size];
+            for (int i = 0; i < size; i++)
+                for (int h = 0; h < size; h++)
+                    _board[i, h] = CellStatus.Dead;
         }
 
         public void SetCellAlive(int x, int y)

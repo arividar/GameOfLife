@@ -39,7 +39,7 @@ namespace GameOfLife
             {
                 for (int y = 0; y < board.Size; y++)
                 { 
-                    Console.Write(board.GetCell(x, y) == CellStatus.Dead ? " . " : " X ");
+                    Console.Write(board.GetCell(x, y) == CellStatus.Dead ? " . " : " O ");
                 }
                 Console.WriteLine();
             }
