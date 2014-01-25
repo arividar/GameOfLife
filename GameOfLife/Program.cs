@@ -50,7 +50,7 @@ namespace GameOfLife
         {
             var board = new GameOfLifeBoard(10);
             SetGenerationZero(board);
-            for (int i = 0; i <= 25; i++)
+            for (int i = 0; i <= 20; i++)
             {
                 PrintBoard(i, board);
                 board = board.NextGenerationBoard();
