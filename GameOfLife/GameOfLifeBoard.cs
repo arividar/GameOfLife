@@ -37,7 +37,12 @@
 
         public void SetCellAlive(int x, int y)
         {
-            _board[x, y] = CellStatus.Alive;
+            SetCell(x, y, CellStatus.Alive);
+        }        
+
+        public void KillCell(int x, int y)
+        {
+            SetCell(x, y, CellStatus.Dead);
         }
 
         public CellStatus GetCell(int x, int y)

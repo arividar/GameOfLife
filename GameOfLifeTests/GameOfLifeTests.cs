@@ -86,6 +86,17 @@ namespace GameOfLifeTests
         }
 
         [TestMethod]
+        public void DeadCellWithTwoNeighboursStaysDead()
+        {
+            var board = new GameOfLifeBoard(5);
+            Assert.AreEqual(0, board.LiveCount);
+            board.SetCellAlive(3, 2);
+            board.SetCellAlive(3, 3);
+            var nextBoard = board.NextGenerationBoard();
+            Assert.IsFalse(nextBoard.IsCellAlive(2, 3) || nextBoard.IsCellAlive(4, 2));
+        }
+
+        [TestMethod]
         public void LiveCellWithMoreThanThreeLiveNeighboursDies()
         {
             var board = new GameOfLifeBoard(5);
