@@ -22,8 +22,21 @@ This is a C# implementation of Conway's Game of Life using .NET 9.0 with a conso
 ```bash
 dotnet build                                           # Build entire solution
 dotnet run --project GameOfLife/GameOfLife.csproj     # Run console simulation
-dotnet test                                           # Run all tests
+dotnet test                                           # Run tests with coverage (55% threshold)
 ```
+
+**Coverage and Quality:**
+```bash
+./build.sh                                            # Complete build pipeline (Unix/macOS)
+build.bat                                             # Complete build pipeline (Windows)
+reportgenerator -reports:GameOfLifeTests/TestResults/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:Html  # Generate coverage report only
+```
+
+**Coverage Integration:**
+- Coverlet automatically collects coverage during `dotnet test`
+- 55% line coverage threshold enforced (build fails if not met)
+- HTML coverage reports generated in `coverage-report/index.html`
+- Coverage artifacts excluded from version control
 
 ## Development Workflow
 

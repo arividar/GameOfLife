@@ -154,3 +154,14 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+# =========================
+# Code Coverage
+# =========================
+
+# Coverage reports and artifacts
+coverage-report/
+TestResults/
+*.cobertura.xml
+*.coverage
+*.coveragexml
