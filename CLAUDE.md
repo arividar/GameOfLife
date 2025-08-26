@@ -22,7 +22,7 @@ This is a C# implementation of Conway's Game of Life using .NET 9.0 with a conso
 ```bash
 dotnet build                                           # Build entire solution
 dotnet run --project GameOfLife/GameOfLife.csproj     # Run console simulation
-dotnet test                                           # Run tests with coverage (85% threshold)
+dotnet test                                           # Run tests with coverage (95% threshold)
 ```
 
 **Coverage and Quality:**
@@ -34,8 +34,9 @@ reportgenerator -reports:GameOfLifeTests/TestResults/coverage.cobertura.xml -tar
 
 **Coverage Integration:**
 - Coverlet automatically collects coverage during `dotnet test`
-- 85% line coverage threshold enforced (build fails if not met)
+- 95% line coverage threshold enforced (build fails if not met)
 - Coverage includes all source files (GameOfLifeBoard.cs and Program.cs)
+- Program.Main() method excluded from coverage analysis via ExcludeFromCodeCoverage attribute
 - HTML coverage reports generated in `coverage-report/index.html`
 - Coverage artifacts excluded from version control
 

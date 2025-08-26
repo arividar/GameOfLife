@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace GameOfLife
@@ -46,6 +47,7 @@ namespace GameOfLife
 
         }
 
+        [ExcludeFromCodeCoverage]
         static void Main()
         {
             var board = new GameOfLifeBoard(10);
