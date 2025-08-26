@@ -395,5 +395,113 @@ namespace GameOfLifeTests
             Assert.IsFalse(nextBoard.IsCellAlive(2, 2));
         }
 
+        // Program class tests
+        [TestMethod]
+        public void SetGenerationZeroCreatesPredefinedPattern()
+        {
+            var board = new GameOfLifeBoard(10);
+            Assert.AreEqual(0, board.LiveCount);
+            
+            Program.SetGenerationZero(board);
+            
+            // Verify the pattern was set correctly
+            Assert.AreEqual(23, board.LiveCount);
+            
+            // Test specific cells that should be alive based on the pattern
+            Assert.IsTrue(board.IsCellAlive(1, 0));
+            Assert.IsTrue(board.IsCellAlive(1, 1));
+            Assert.IsTrue(board.IsCellAlive(1, 2));
+            Assert.IsTrue(board.IsCellAlive(1, 3));
+            Assert.IsTrue(board.IsCellAlive(2, 0));
+            Assert.IsTrue(board.IsCellAlive(2, 1));
+            Assert.IsTrue(board.IsCellAlive(2, 2));
+            Assert.IsTrue(board.IsCellAlive(2, 3));
+            Assert.IsTrue(board.IsCellAlive(3, 4));
+            Assert.IsTrue(board.IsCellAlive(3, 5));
+            Assert.IsTrue(board.IsCellAlive(6, 2));
+            Assert.IsTrue(board.IsCellAlive(6, 3));
+            Assert.IsTrue(board.IsCellAlive(6, 4));
+            Assert.IsTrue(board.IsCellAlive(7, 2));
+            Assert.IsTrue(board.IsCellAlive(7, 3));
+            Assert.IsTrue(board.IsCellAlive(8, 4));
+            Assert.IsTrue(board.IsCellAlive(8, 5));
+            Assert.IsTrue(board.IsCellAlive(9, 4));
+            Assert.IsTrue(board.IsCellAlive(9, 5));
+            Assert.IsTrue(board.IsCellAlive(9, 6));
+            Assert.IsTrue(board.IsCellAlive(9, 7));
+            Assert.IsTrue(board.IsCellAlive(9, 8));
+            Assert.IsTrue(board.IsCellAlive(9, 9));
+        }
+
+        [TestMethod]
+        public void SetGenerationZeroWorksWithLargeBoardSizes()
+        {
+            var largeBoard = new GameOfLifeBoard(15);
+            Assert.AreEqual(0, largeBoard.LiveCount);
+            
+            Program.SetGenerationZero(largeBoard);
+            
+            // Should set all 23 cells since board is large enough
+            Assert.AreEqual(23, largeBoard.LiveCount);
+            
+            // Verify some key positions
+            Assert.IsTrue(largeBoard.IsCellAlive(1, 0));
+            Assert.IsTrue(largeBoard.IsCellAlive(9, 9));
+        }
+
+        [TestMethod]
+        public void PrintBoardDoesNotThrowException()
+        {
+            var board = new GameOfLifeBoard(3);
+            board.SetCellAlive(1, 1);
+            
+            // This test verifies PrintBoard can be called without throwing exceptions
+            // We can't easily test console output, but we can ensure it executes
+            try 
+            {
+                Program.PrintBoard(0, board);
+                Program.PrintBoard(5, board);
+                Program.PrintBoard(-1, board);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("PrintBoard should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void PrintBoardHandlesEmptyBoard()
+        {
+            var board = new GameOfLifeBoard(2);
+            
+            try 
+            {
+                Program.PrintBoard(0, board);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("PrintBoard should handle empty boards without throwing exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void PrintBoardHandlesLargeBoard()
+        {
+            var board = new GameOfLifeBoard(10);
+            Program.SetGenerationZero(board);
+            
+            try 
+            {
+                Program.PrintBoard(1, board);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("PrintBoard should handle large boards without throwing exceptions");
+            }
+        }
+
     }
 }

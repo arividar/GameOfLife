@@ -3,9 +3,9 @@ using System.Globalization;
 
 namespace GameOfLife
 {
-    class Program
+    public class Program
     {
-        private static void SetGenerationZero(GameOfLifeBoard theBoard)
+        public static void SetGenerationZero(GameOfLifeBoard theBoard)
         {
             theBoard.SetCellAlive(1, 0);
             theBoard.SetCellAlive(1, 1);
@@ -32,7 +32,7 @@ namespace GameOfLife
             theBoard.SetCellAlive(9, 9);
         }
 
-        private static void PrintBoard(int generation, GameOfLifeBoard board)
+        public static void PrintBoard(int generation, GameOfLifeBoard board)
         {
             Console.WriteLine("Generation: "+generation.ToString(CultureInfo.InvariantCulture));
             for (int x = 0; x < board.Size; x++)
