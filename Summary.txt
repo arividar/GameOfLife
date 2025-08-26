@@ -1,0 +1,24 @@
+Summary - GameOfLife Coverage Report
+  Generated on: 8/26/2025 - 9:24:52 PM
+  Coverage date: 8/26/2025 - 9:24:52 PM
+  Parser: Cobertura
+  Assemblies: 1
+  Classes: 2
+  Files: 2
+  Line coverage: 100%
+  Covered lines: 101
+  Uncovered lines: 0
+  Coverable lines: 101
+  Total lines: 167
+  Branch coverage: 100% (36 of 36)
+  Covered branches: 36
+  Total branches: 36
+  Method coverage: 100% (14 of 14)
+  Full method coverage: 100% (14 of 14)
+  Covered methods: 14
+  Fully covered methods: 14
+  Total methods: 14
+
+GameOfLife                      100%
+  GameOfLife.GameOfLifeBoard    100%
+  GameOfLife.Program            100%

@@ -18,8 +18,8 @@ if !errorlevel! neq 0 (
 echo 📊 Generating coverage report...
 reportgenerator ^
   -reports:"GameOfLifeTests\TestResults\coverage.cobertura.xml" ^
-  -targetdir:"coverage-report" ^
-  -reporttypes:"Html;TextSummary" ^
+  -targetdir:".\" ^
+  -reporttypes:"TextSummary" ^
   -title:"GameOfLife Coverage Report"
 if !errorlevel! neq 0 (
     echo ❌ Report generation failed
@@ -30,4 +30,4 @@ echo ✅ Build pipeline completed successfully!
 echo.
 echo 📈 Coverage report generated at: coverage-report\index.html
 echo 📋 Summary:
-type coverage-report\Summary.txt
+type .\Summary.txt

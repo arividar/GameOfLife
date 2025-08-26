@@ -9,13 +9,11 @@ dotnet test
 
 echo "📊 Generating coverage report..."
 reportgenerator \
-  -reports:"GameOfLifeTests/TestResults/coverage.cobertura.xml" \
-  -targetdir:"coverage-report" \
-  -reporttypes:"Html;TextSummary" \
-  -title:"GameOfLife Coverage Report"
+    -reports:"GameOfLifeTests/TestResults/coverage.cobertura.xml" \
+    -targetdir:"./" \
+    -reporttypes:"TextSummary" \
+    -title:"GameOfLife Coverage Report"
 
 echo "✅ Build pipeline completed successfully!"
-echo ""
-echo "📈 Coverage report generated at: coverage-report/index.html"
-echo "📋 Summary:"
-cat coverage-report/Summary.txt
+echo "📋 Test Coverage Summary:"
+cat ./Summary.txt
