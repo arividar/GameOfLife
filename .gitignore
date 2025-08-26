@@ -166,4 +166,4 @@ TestResults/
 *.coverage
 *.coveragexml
 
-./Summary.txt
+Summary.txt
