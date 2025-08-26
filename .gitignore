@@ -165,3 +165,5 @@ TestResults/
 *.cobertura.xml
 *.coverage
 *.coveragexml
+
+./Summary.txt
