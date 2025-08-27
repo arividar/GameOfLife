@@ -57,7 +57,6 @@ namespace GameOfLife
                 PrintBoard(i, board);
                 board = board.NextGenerationBoard();
             }
-            Console.ReadLine();
         }
 
     }
