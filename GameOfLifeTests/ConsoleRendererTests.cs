@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameOfLife;
+using System;
 
 namespace GameOfLifeTests
 {
@@ -474,6 +475,128 @@ namespace GameOfLifeTests
             {
                 Assert.Fail("DrawBorder should handle small boards gracefully");
             }
+        }
+
+        // Centering logic tests (Phase 2, Step 4)
+        [TestMethod]
+        public void CalculateCenteredBoardPositionReturnsValidCoordinates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(10, 10);
+            
+            Assert.IsTrue(x >= 0, "Centered board X position should be non-negative");
+            Assert.IsTrue(y >= 0, "Centered board Y position should be non-negative");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionCentersCorrectlyInStandardTerminal()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Test with known terminal size (this will use actual terminal dimensions)
+            var (x, y) = renderer.CalculateCenteredBoardPosition(20, 10);
+            var (termWidth, termHeight) = renderer.GetTerminalSize();
+            
+            int expectedX = Math.Max(0, (termWidth - 22) / 2); // 20 + 2 for border
+            int expectedY = Math.Max(0, (termHeight - 12) / 2); // 10 + 2 for border
+            
+            Assert.AreEqual(expectedX, x, "Board should be centered horizontally with border consideration");
+            Assert.AreEqual(expectedY, y, "Board should be centered vertically with border consideration");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionWithCustomTerminalSize()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(10, 8, 80, 25);
+            
+            Assert.AreEqual(34, x, "10x8 board in 80x25 terminal should be at x=34 ((80-12)/2)");
+            Assert.AreEqual(8, y, "10x8 board in 80x25 terminal should be at y=8 ((25-10)/2)");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionHandlesSmallTerminals()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(20, 15, 30, 20);
+            
+            Assert.AreEqual(0, x, "Large board in small terminal should fallback to x=0");
+            Assert.AreEqual(0, y, "Large board in small terminal should fallback to y=0");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionHandlesExactFitTerminal()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(10, 8, 12, 10);
+            
+            Assert.AreEqual(0, x, "Board exactly fitting terminal width should be at x=0");
+            Assert.AreEqual(0, y, "Board exactly fitting terminal height should be at y=0");
+        }
+
+        [TestMethod]
+        public void IsBoardTooLargeForTerminalReturnsTrueForOversizedBoard()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool tooLarge = renderer.IsBoardTooLargeForTerminal(25, 20, 30, 25);
+            Assert.IsTrue(tooLarge, "Board requiring 27x22 space should be too large for 30x25 terminal");
+        }
+
+        [TestMethod]
+        public void IsBoardTooLargeForTerminalReturnsFalseForFittingBoard()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool tooLarge = renderer.IsBoardTooLargeForTerminal(10, 8, 80, 25);
+            Assert.IsFalse(tooLarge, "Board requiring 12x10 space should fit in 80x25 terminal");
+        }
+
+        [TestMethod]
+        public void SetCursorToCenteredBoardPositionDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.SetCursorToCenteredBoardPosition(15, 12);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("SetCursorToCenteredBoardPosition should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void GetOptimalBoardSizeForTerminalReturnsReasonableSize()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (width, height) = renderer.GetOptimalBoardSizeForTerminal();
+            
+            Assert.IsTrue(width > 5, "Optimal board width should be reasonable (> 5)");
+            Assert.IsTrue(height > 5, "Optimal board height should be reasonable (> 5)");
+            Assert.IsTrue(width <= 50, "Optimal board width should not be excessive (<= 50)");
+            Assert.IsTrue(height <= 30, "Optimal board height should not be excessive (<= 30)");
+        }
+
+        [TestMethod]
+        public void GetOptimalBoardSizeForCustomTerminalReturnsAppropriateSize()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (width, height) = renderer.GetOptimalBoardSizeForTerminal(80, 25);
+            
+            // Should leave room for borders and some margin
+            Assert.IsTrue(width < 78, "Optimal width should leave room for borders in 80-wide terminal");
+            Assert.IsTrue(height < 23, "Optimal height should leave room for borders in 25-high terminal");
+            Assert.IsTrue(width >= 10, "Optimal width should be at least 10 for playability");
+            Assert.IsTrue(height >= 8, "Optimal height should be at least 8 for playability");
         }
     }
 }
