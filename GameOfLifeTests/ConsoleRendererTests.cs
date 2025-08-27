@@ -234,5 +234,153 @@ namespace GameOfLifeTests
                 Assert.Fail("Complete console initialization sequence should not throw exceptions");
             }
         }
+
+        // Enhanced cell rendering tests (Phase 1, Step 3)
+        [TestMethod]
+        public void GetAliveCellCharacterReturnsUnicodeBlock()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string aliveChar = renderer.GetAliveCellCharacter();
+            Assert.AreEqual("█", aliveChar, "Alive cell should use full block Unicode character");
+        }
+
+        [TestMethod]
+        public void GetDeadCellCharacterReturnsUnicodeMiddleDot()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string deadChar = renderer.GetDeadCellCharacter();
+            Assert.AreEqual("·", deadChar, "Dead cell should use middle dot Unicode character");
+        }
+
+        [TestMethod]
+        public void GetAliveCellColorReturnsGreenAnsiCode()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string aliveColor = renderer.GetAliveCellColor();
+            Assert.AreEqual("\x1b[32m", aliveColor, "Alive cell should use green ANSI color code");
+        }
+
+        [TestMethod]
+        public void GetDeadCellColorReturnsGrayAnsiCode()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string deadColor = renderer.GetDeadCellColor();
+            Assert.AreEqual("\x1b[90m", deadColor, "Dead cell should use bright black (gray) ANSI color code");
+        }
+
+        [TestMethod]
+        public void GetColorResetReturnsResetAnsiCode()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string resetCode = renderer.GetColorReset();
+            Assert.AreEqual("\x1b[0m", resetCode, "Color reset should use ANSI reset code");
+        }
+
+        [TestMethod]
+        public void RenderCellReturnsFormattedAliveCellString()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string formattedCell = renderer.RenderCell(CellStatus.Alive);
+            string expected = "\x1b[32m█\x1b[0m";
+            Assert.AreEqual(expected, formattedCell, "Alive cell should be formatted with green color and reset");
+        }
+
+        [TestMethod]
+        public void RenderCellReturnsFormattedDeadCellString()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string formattedCell = renderer.RenderCell(CellStatus.Dead);
+            string expected = "\x1b[90m·\x1b[0m";
+            Assert.AreEqual(expected, formattedCell, "Dead cell should be formatted with gray color and reset");
+        }
+
+        // Board positioning tests (Phase 1, Step 4)
+        [TestMethod]
+        public void CalculateBoardPositionReturnsValidCoordinates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(10, 10, 80, 25);
+            
+            Assert.IsTrue(x >= 0, "Board X position should be non-negative");
+            Assert.IsTrue(y >= 0, "Board Y position should be non-negative");
+        }
+
+        [TestMethod]
+        public void CalculateBoardPositionCentersCorrectly()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(10, 10, 80, 25);
+            
+            Assert.AreEqual(35, x, "Board should be centered horizontally (80-10)/2 = 35");
+            Assert.AreEqual(7, y, "Board should be centered vertically (25-10)/2 = 7");
+        }
+
+        [TestMethod]
+        public void CalculateBoardPositionHandlesLargeBoardGracefully()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(100, 100, 80, 25);
+            
+            Assert.AreEqual(0, x, "Large board X position should be clamped to 0");
+            Assert.AreEqual(0, y, "Large board Y position should be clamped to 0");
+        }
+
+        [TestMethod]
+        public void SetCursorToBoardPositionDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.SetCursorToBoardPosition(10, 10);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("SetCursorToBoardPosition should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void MoveCursorToPositionDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.MoveCursorToPosition(10, 5);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("MoveCursorToPosition should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void MoveCursorToPositionHandlesNegativeCoordinates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.MoveCursorToPosition(-5, -3);
+                Assert.IsTrue(true); // Should handle negative coordinates gracefully
+            }
+            catch
+            {
+                Assert.Fail("MoveCursorToPosition should handle negative coordinates gracefully");
+            }
+        }
     }
 }
