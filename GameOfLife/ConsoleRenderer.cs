@@ -231,5 +231,80 @@ namespace GameOfLife
                 // This might happen when output is redirected or on unsupported terminals
             }
         }
+
+        public string GetTopLeftBorderCharacter()
+        {
+            return "┌";
+        }
+
+        public string GetTopRightBorderCharacter()
+        {
+            return "┐";
+        }
+
+        public string GetBottomLeftBorderCharacter()
+        {
+            return "└";
+        }
+
+        public string GetBottomRightBorderCharacter()
+        {
+            return "┘";
+        }
+
+        public string GetHorizontalBorderCharacter()
+        {
+            return "─";
+        }
+
+        public string GetVerticalBorderCharacter()
+        {
+            return "│";
+        }
+
+        public (int width, int height) CalculateBorderDimensions(int boardWidth, int boardHeight)
+        {
+            return (boardWidth + 2, boardHeight + 2);
+        }
+
+        public void DrawBorder(int boardWidth, int boardHeight, int startX, int startY)
+        {
+            try
+            {
+                var (borderWidth, borderHeight) = CalculateBorderDimensions(boardWidth, boardHeight);
+                
+                // Draw top border
+                MoveCursorToPosition(startX, startY);
+                Console.Write(GetTopLeftBorderCharacter());
+                for (int i = 0; i < boardWidth; i++)
+                {
+                    Console.Write(GetHorizontalBorderCharacter());
+                }
+                Console.Write(GetTopRightBorderCharacter());
+                
+                // Draw side borders
+                for (int row = 1; row < borderHeight - 1; row++)
+                {
+                    MoveCursorToPosition(startX, startY + row);
+                    Console.Write(GetVerticalBorderCharacter());
+                    MoveCursorToPosition(startX + borderWidth - 1, startY + row);
+                    Console.Write(GetVerticalBorderCharacter());
+                }
+                
+                // Draw bottom border
+                MoveCursorToPosition(startX, startY + borderHeight - 1);
+                Console.Write(GetBottomLeftBorderCharacter());
+                for (int i = 0; i < boardWidth; i++)
+                {
+                    Console.Write(GetHorizontalBorderCharacter());
+                }
+                Console.Write(GetBottomRightBorderCharacter());
+            }
+            catch (Exception)
+            {
+                // Handle case where border cannot be drawn
+                // This might happen when output is redirected or on unsupported terminals
+            }
+        }
     }
 }

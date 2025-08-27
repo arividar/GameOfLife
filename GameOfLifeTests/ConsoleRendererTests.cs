@@ -382,5 +382,98 @@ namespace GameOfLifeTests
                 Assert.Fail("MoveCursorToPosition should handle negative coordinates gracefully");
             }
         }
+
+        // Border system tests (Phase 2, Step 3)
+        [TestMethod]
+        public void GetTopBorderCharacterReturnsCorrectUnicode()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string topLeft = renderer.GetTopLeftBorderCharacter();
+            string topRight = renderer.GetTopRightBorderCharacter();
+            string horizontal = renderer.GetHorizontalBorderCharacter();
+            
+            Assert.AreEqual("┌", topLeft, "Top left border should be corner character");
+            Assert.AreEqual("┐", topRight, "Top right border should be corner character");
+            Assert.AreEqual("─", horizontal, "Horizontal border should be line character");
+        }
+
+        [TestMethod]
+        public void GetBottomBorderCharacterReturnsCorrectUnicode()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string bottomLeft = renderer.GetBottomLeftBorderCharacter();
+            string bottomRight = renderer.GetBottomRightBorderCharacter();
+            
+            Assert.AreEqual("└", bottomLeft, "Bottom left border should be corner character");
+            Assert.AreEqual("┘", bottomRight, "Bottom right border should be corner character");
+        }
+
+        [TestMethod]
+        public void GetVerticalBorderCharacterReturnsCorrectUnicode()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string vertical = renderer.GetVerticalBorderCharacter();
+            Assert.AreEqual("│", vertical, "Vertical border should be pipe character");
+        }
+
+        [TestMethod]
+        public void CalculateBorderDimensionsReturnsCorrectSize()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (width, height) = renderer.CalculateBorderDimensions(10, 10);
+            
+            Assert.AreEqual(12, width, "Border width should be board width + 2");
+            Assert.AreEqual(12, height, "Border height should be board height + 2");
+        }
+
+        [TestMethod]
+        public void CalculateBorderDimensionsHandlesVariousSizes()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (w1, h1) = renderer.CalculateBorderDimensions(5, 8);
+            var (w2, h2) = renderer.CalculateBorderDimensions(20, 15);
+            
+            Assert.AreEqual(7, w1, "5x8 board should have 7 width border");
+            Assert.AreEqual(10, h1, "5x8 board should have 10 height border");
+            Assert.AreEqual(22, w2, "20x15 board should have 22 width border");
+            Assert.AreEqual(17, h2, "20x15 board should have 17 height border");
+        }
+
+        [TestMethod]
+        public void DrawBorderDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.DrawBorder(10, 10, 5, 3);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("DrawBorder should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void DrawBorderHandlesSmallBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.DrawBorder(3, 3, 0, 0);
+                Assert.IsTrue(true); // Should handle minimum size boards
+            }
+            catch
+            {
+                Assert.Fail("DrawBorder should handle small boards gracefully");
+            }
+        }
     }
 }
