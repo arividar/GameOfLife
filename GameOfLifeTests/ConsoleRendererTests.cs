@@ -513,7 +513,7 @@ namespace GameOfLifeTests
             var (x, y) = renderer.CalculateCenteredBoardPosition(10, 8, 80, 25);
             
             Assert.AreEqual(34, x, "10x8 board in 80x25 terminal should be at x=34 ((80-12)/2)");
-            Assert.AreEqual(8, y, "10x8 board in 80x25 terminal should be at y=8 ((25-10)/2)");
+            Assert.AreEqual(7, y, "10x8 board in 80x25 terminal should be at y=7 ((25-10)/2)");
         }
 
         [TestMethod]
@@ -523,8 +523,8 @@ namespace GameOfLifeTests
             
             var (x, y) = renderer.CalculateCenteredBoardPosition(20, 15, 30, 20);
             
-            Assert.AreEqual(0, x, "Large board in small terminal should fallback to x=0");
-            Assert.AreEqual(0, y, "Large board in small terminal should fallback to y=0");
+            Assert.AreEqual(4, x, "20x15 board in 30x20 terminal should be at x=4 ((30-22)/2)");
+            Assert.AreEqual(1, y, "20x15 board in 30x20 terminal should be at y=1 ((20-17)/2)");
         }
 
         [TestMethod]
@@ -543,8 +543,8 @@ namespace GameOfLifeTests
         {
             var renderer = new ConsoleRenderer();
             
-            bool tooLarge = renderer.IsBoardTooLargeForTerminal(25, 20, 30, 25);
-            Assert.IsTrue(tooLarge, "Board requiring 27x22 space should be too large for 30x25 terminal");
+            bool tooLarge = renderer.IsBoardTooLargeForTerminal(30, 25, 30, 25);
+            Assert.IsTrue(tooLarge, "Board requiring 32x27 space should be too large for 30x25 terminal");
         }
 
         [TestMethod]

@@ -306,5 +306,60 @@ namespace GameOfLife
                 // This might happen when output is redirected or on unsupported terminals
             }
         }
+
+        public (int x, int y) CalculateCenteredBoardPosition(int boardWidth, int boardHeight)
+        {
+            var (terminalWidth, terminalHeight) = GetTerminalSize();
+            return CalculateCenteredBoardPosition(boardWidth, boardHeight, terminalWidth, terminalHeight);
+        }
+
+        public (int x, int y) CalculateCenteredBoardPosition(int boardWidth, int boardHeight, int terminalWidth, int terminalHeight)
+        {
+            var (borderWidth, borderHeight) = CalculateBorderDimensions(boardWidth, boardHeight);
+            
+            int centerX = Math.Max(0, (terminalWidth - borderWidth) / 2);
+            int centerY = Math.Max(0, (terminalHeight - borderHeight) / 2);
+            
+            return (centerX, centerY);
+        }
+
+        public bool IsBoardTooLargeForTerminal(int boardWidth, int boardHeight, int terminalWidth, int terminalHeight)
+        {
+            var (borderWidth, borderHeight) = CalculateBorderDimensions(boardWidth, boardHeight);
+            return borderWidth > terminalWidth || borderHeight > terminalHeight;
+        }
+
+        public void SetCursorToCenteredBoardPosition(int boardWidth, int boardHeight)
+        {
+            try
+            {
+                var (centerX, centerY) = CalculateCenteredBoardPosition(boardWidth, boardHeight);
+                Console.SetCursorPosition(centerX, centerY);
+            }
+            catch (Exception)
+            {
+                // Handle case where cursor position cannot be set
+                // This might happen when output is redirected or on unsupported terminals
+            }
+        }
+
+        public (int width, int height) GetOptimalBoardSizeForTerminal()
+        {
+            var (terminalWidth, terminalHeight) = GetTerminalSize();
+            return GetOptimalBoardSizeForTerminal(terminalWidth, terminalHeight);
+        }
+
+        public (int width, int height) GetOptimalBoardSizeForTerminal(int terminalWidth, int terminalHeight)
+        {
+            // Leave room for borders (2 extra) plus some margin for readability
+            int availableWidth = terminalWidth - 4; // Border + 2 margin
+            int availableHeight = terminalHeight - 4; // Border + 2 margin
+            
+            // Ensure minimum playable size
+            int optimalWidth = Math.Max(10, Math.Min(availableWidth, 50));
+            int optimalHeight = Math.Max(8, Math.Min(availableHeight, 30));
+            
+            return (optimalWidth, optimalHeight);
+        }
     }
 }
