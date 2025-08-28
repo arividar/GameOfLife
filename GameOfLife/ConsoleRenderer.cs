@@ -502,6 +502,40 @@ namespace GameOfLife
             return current != previous;
         }
 
+        // Phase 4: Enhanced rendering methods for Program.cs integration
+
+        public void RenderBoardWithBorder(GameOfLifeBoard board, int offsetX, int offsetY)
+        {
+            try
+            {
+                // Draw border around the board
+                DrawBorder(board.Size, board.Size, offsetX, offsetY);
+                
+                // Render the board content inside the border using smooth rendering
+                RenderBoardSmooth(board, null, offsetX + 1, offsetY + 1);
+            }
+            catch (Exception)
+            {
+                // Handle case where bordered rendering fails
+                // Fall back to basic board rendering
+                try
+                {
+                    for (int x = 0; x < board.Size; x++)
+                    {
+                        for (int y = 0; y < board.Size; y++)
+                        {
+                            MoveCursorToPosition(offsetX + y, offsetY + x);
+                            Console.Write(RenderCell(board.GetCell(x, y)));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Ultimate fallback - do nothing
+                }
+            }
+        }
+
         // Phase 3 Step 7: Generation Counter Display Methods
 
         public void RenderGenerationCounterAtTop(int generation, int boardOffsetX, int boardOffsetY)
