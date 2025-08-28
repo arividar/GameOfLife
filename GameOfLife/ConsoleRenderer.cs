@@ -3,11 +3,18 @@ using System.Text;
 
 namespace GameOfLife
 {
+    public enum GenerationCounterPosition
+    {
+        Top,
+        Bottom
+    }
+
     public class ConsoleRenderer
     {
         private bool _originalCursorVisible;
         private Encoding _originalEncoding;
         private int _animationDelay = 500; // Default 500ms delay for smooth rendering
+        private GenerationCounterPosition _generationCounterPosition = GenerationCounterPosition.Top; // Default to top position
 
         public void InitializeConsole()
         {
@@ -494,5 +501,101 @@ namespace GameOfLife
         {
             return current != previous;
         }
+
+        // Phase 3 Step 7: Generation Counter Display Methods
+
+        public void RenderGenerationCounterAtTop(int generation, int boardOffsetX, int boardOffsetY)
+        {
+            try
+            {
+                var (x, y) = CalculateGenerationCounterTopPosition(boardOffsetX, boardOffsetY);
+                MoveCursorToPosition(x, y);
+                string formatted = FormatGenerationCounter(generation);
+                Console.Write(formatted);
+            }
+            catch (Exception)
+            {
+                // Handle case where generation counter rendering fails
+            }
+        }
+
+        public void RenderGenerationCounterAtBottom(int generation, int boardWidth, int boardHeight, int boardOffsetY)
+        {
+            try
+            {
+                var (x, y) = CalculateGenerationCounterBottomPosition(boardWidth, boardHeight, boardWidth, boardOffsetY);
+                MoveCursorToPosition(x, y);
+                string formatted = FormatGenerationCounter(generation);
+                Console.Write(formatted);
+            }
+            catch (Exception)
+            {
+                // Handle case where generation counter rendering fails
+            }
+        }
+
+        public (int x, int y) CalculateGenerationCounterTopPosition(int boardOffsetX, int boardOffsetY)
+        {
+            // Position counter one line above the game area
+            int x = Math.Max(0, boardOffsetX);
+            int y = Math.Max(0, boardOffsetY - 1);
+            return (x, y);
+        }
+
+        public (int x, int y) CalculateGenerationCounterBottomPosition(int boardWidth, int boardHeight, int boardOffsetX, int boardOffsetY)
+        {
+            // Position counter one line below the game area
+            int x = Math.Max(0, boardOffsetX);
+            int y = boardOffsetY + boardHeight + 1;
+            return (x, y);
+        }
+
+        public string FormatGenerationCounter(int generation)
+        {
+            return $"Generation {generation}";
+        }
+
+        public int GetGenerationCounterLength(int generation)
+        {
+            return FormatGenerationCounter(generation).Length;
+        }
+
+        public void ClearGenerationCounterArea(int x, int y, int length)
+        {
+            try
+            {
+                MoveCursorToPosition(x, y);
+                Console.Write(new string(' ', length));
+            }
+            catch (Exception)
+            {
+                // Handle case where clearing fails
+            }
+        }
+
+        public void SetGenerationCounterPosition(GenerationCounterPosition position)
+        {
+            _generationCounterPosition = position;
+        }
+
+        public GenerationCounterPosition GetGenerationCounterPosition()
+        {
+            return _generationCounterPosition;
+        }
+
+        public void RenderGenerationCounterWithFormatting(int generation, int x, int y, string format)
+        {
+            try
+            {
+                MoveCursorToPosition(x, y);
+                string formatted = string.Format(format, generation);
+                Console.Write(formatted);
+            }
+            catch (Exception)
+            {
+                // Handle case where custom formatting fails
+            }
+        }
+
     }
 }
