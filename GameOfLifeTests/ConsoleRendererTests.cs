@@ -1119,5 +1119,222 @@ namespace GameOfLifeTests
                 Assert.Fail("ApplyAnimationDelay should not throw exceptions");
             }
         }
+
+        // Phase 3 Step 7: Generation Counter Display Tests
+
+        [TestMethod]
+        public void RenderGenerationCounterAtTopDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RenderGenerationCounterAtTop(5, 10, 8);
+                Assert.IsTrue(true); // Should not throw exceptions when rendering at top
+            }
+            catch
+            {
+                Assert.Fail("RenderGenerationCounterAtTop should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void RenderGenerationCounterAtBottomDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RenderGenerationCounterAtBottom(12, 15, 20, 25);
+                Assert.IsTrue(true); // Should not throw exceptions when rendering at bottom
+            }
+            catch
+            {
+                Assert.Fail("RenderGenerationCounterAtBottom should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void CalculateGenerationCounterTopPositionReturnsValidCoordinates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateGenerationCounterTopPosition(10, 8);
+            
+            Assert.IsTrue(x >= 0, "Top counter X position should be non-negative");
+            Assert.IsTrue(y >= 0, "Top counter Y position should be non-negative");
+            Assert.IsTrue(y < 8, "Top counter should be above the game area");
+        }
+
+        [TestMethod]
+        public void CalculateGenerationCounterBottomPositionReturnsValidCoordinates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateGenerationCounterBottomPosition(15, 20, 10, 12);
+            
+            Assert.IsTrue(x >= 0, "Bottom counter X position should be non-negative");
+            Assert.IsTrue(y >= 0, "Bottom counter Y position should be non-negative");
+            Assert.IsTrue(y > 20, "Bottom counter should be below the game area");
+        }
+
+        [TestMethod]
+        public void FormatGenerationCounterReturnsCorrectString()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string formatted = renderer.FormatGenerationCounter(42);
+            
+            Assert.IsNotNull(formatted, "Formatted generation counter should not be null");
+            Assert.IsTrue(formatted.Contains("42"), "Formatted string should contain generation number");
+            Assert.IsTrue(formatted.Contains("Generation"), "Formatted string should contain 'Generation' label");
+        }
+
+        [TestMethod]
+        public void FormatGenerationCounterHandlesZeroGeneration()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string formatted = renderer.FormatGenerationCounter(0);
+            
+            Assert.IsNotNull(formatted, "Formatted generation counter should not be null for zero");
+            Assert.IsTrue(formatted.Contains("0"), "Formatted string should contain zero generation number");
+        }
+
+        [TestMethod]
+        public void FormatGenerationCounterHandlesLargeGeneration()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string formatted = renderer.FormatGenerationCounter(999999);
+            
+            Assert.IsNotNull(formatted, "Formatted generation counter should not be null for large numbers");
+            Assert.IsTrue(formatted.Contains("999999"), "Formatted string should contain large generation number");
+        }
+
+        [TestMethod]
+        public void GetGenerationCounterLengthReturnsCorrectLength()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            int length = renderer.GetGenerationCounterLength(123);
+            
+            Assert.IsTrue(length > 0, "Generation counter length should be positive");
+            Assert.IsTrue(length >= 10, "Generation counter should be at least 10 characters (for 'Generation ' + digits)");
+        }
+
+        [TestMethod]
+        public void ClearGenerationCounterAreaDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.ClearGenerationCounterArea(5, 3, 20);
+                Assert.IsTrue(true); // Should not throw exceptions when clearing counter area
+            }
+            catch
+            {
+                Assert.Fail("ClearGenerationCounterArea should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void SetGenerationCounterPositionUpdatesPosition()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.SetGenerationCounterPosition(GenerationCounterPosition.Top);
+                Assert.IsTrue(true); // Should accept Top position
+                
+                renderer.SetGenerationCounterPosition(GenerationCounterPosition.Bottom);
+                Assert.IsTrue(true); // Should accept Bottom position
+            }
+            catch
+            {
+                Assert.Fail("SetGenerationCounterPosition should not throw exceptions for valid positions");
+            }
+        }
+
+        [TestMethod]
+        public void GetGenerationCounterPositionReturnsCurrentPosition()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetGenerationCounterPosition(GenerationCounterPosition.Bottom);
+            var position = renderer.GetGenerationCounterPosition();
+            
+            Assert.AreEqual(GenerationCounterPosition.Bottom, position, "Should return the set position");
+        }
+
+        [TestMethod]
+        public void GenerationCounterDoesNotOverlapWithGameArea()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Test top position doesn't overlap
+            var (topX, topY) = renderer.CalculateGenerationCounterTopPosition(10, 5);
+            Assert.IsTrue(topY < 5, "Top counter should not overlap with game area starting at Y=5");
+            
+            // Test bottom position doesn't overlap
+            var (bottomX, bottomY) = renderer.CalculateGenerationCounterBottomPosition(15, 10, 10, 15);
+            Assert.IsTrue(bottomY > 15 + 10, "Bottom counter should not overlap with game area ending at Y=25");
+        }
+
+        [TestMethod]
+        public void GenerationCounterStaysWithinTerminalBounds()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                // Test with small terminal dimensions
+                renderer.RenderGenerationCounterAtTop(999, 5, 3);
+                renderer.RenderGenerationCounterAtBottom(999, 20, 15, 25);
+                Assert.IsTrue(true); // Should handle small terminals gracefully
+            }
+            catch
+            {
+                Assert.Fail("Generation counter should handle small terminal dimensions");
+            }
+        }
+
+        [TestMethod]
+        public void RenderGenerationCounterWithCustomFormattingDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RenderGenerationCounterWithFormatting(42, 10, 5, "Gen: {0}");
+                Assert.IsTrue(true); // Should accept custom formatting
+            }
+            catch
+            {
+                Assert.Fail("RenderGenerationCounterWithFormatting should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void GenerationCounterHandlesConsecutiveUpdates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                // Simulate consecutive generation updates
+                for (int i = 0; i < 5; i++)
+                {
+                    renderer.RenderGenerationCounterAtTop(i, 10, 8);
+                }
+                Assert.IsTrue(true); // Should handle consecutive updates
+            }
+            catch
+            {
+                Assert.Fail("Generation counter should handle consecutive updates");
+            }
+        }
     }
 }
