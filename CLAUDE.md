@@ -8,13 +8,17 @@ This is a C# implementation of Conway's Game of Life using .NET 9.0 with a conso
 
 **Core Components:**
 - `GameOfLife/GameOfLifeBoard.cs` - Main game logic with `GameOfLifeBoard` class implementing Conway's Game of Life rules
+- `GameOfLife/ConsoleRenderer.cs` - Terminal rendering system with UTF-8 support, ANSI colors, centering, and border drawing
 - `GameOfLife/Program.cs` - Console application entry point with predefined initial pattern and 20-generation simulation
 - `GameOfLifeTests/GameOfLifeTests.cs` - MSTest unit tests covering all game rules and edge cases
+- `GameOfLifeTests/ConsoleRendererTests.cs` - MSTest unit tests for terminal rendering functionality
 
 **Key Architecture:**
 - `CellStatus` enum: `Alive` or `Dead` cell states
 - `GameOfLifeBoard` class: Square grid with methods for cell manipulation, neighbor counting, and generation advancement
+- `ConsoleRenderer` class: Handles terminal display, UTF-8 characters, ANSI colors, centering logic, and border drawing
 - Immutable generation progression: `NextGenerationBoard()` returns new board instance
+- Terminal rendering with Unicode block characters (█) for alive cells and middle dots (·) for dead cells
 
 ## Development Commands
 
@@ -22,7 +26,7 @@ This is a C# implementation of Conway's Game of Life using .NET 9.0 with a conso
 ```bash
 dotnet build                                           # Build entire solution
 dotnet run --project GameOfLife/GameOfLife.csproj     # Run console simulation
-dotnet test                                           # Run tests with coverage (95% threshold)
+dotnet test                                           # Run tests with coverage (80% threshold)
 ```
 
 **Coverage and Quality:**
@@ -34,10 +38,11 @@ reportgenerator -reports:GameOfLifeTests/TestResults/coverage.cobertura.xml -tar
 
 **Coverage Integration:**
 - Coverlet automatically collects coverage during `dotnet test`
-- 95% line coverage threshold enforced (build fails if not met)
-- Coverage includes all source files (GameOfLifeBoard.cs and Program.cs)
+- 80% line coverage threshold enforced (build fails if not met)
+- Coverage includes all source files (GameOfLifeBoard.cs, ConsoleRenderer.cs, and Program.cs)
 - Program.Main() method excluded from coverage analysis via ExcludeFromCodeCoverage attribute
-- HTML coverage reports generated in `coverage-report/index.html`
+- Build scripts generate text summary reports (`Summary.txt`)
+- HTML coverage reports can be generated with: `reportgenerator -reports:GameOfLifeTests/TestResults/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:Html`
 - Coverage artifacts excluded from version control
 
 ## Development Workflow
