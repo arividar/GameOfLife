@@ -746,5 +746,378 @@ namespace GameOfLifeTests
             Assert.AreEqual(37, x, "Narrow board should center horizontally ((80-5)/2 = 37)");
             Assert.AreEqual(0, y, "Very tall board should be clamped to y=0");
         }
+
+        // Phase 3 Step 6: Smooth rendering tests
+        [TestMethod]
+        public void RenderCellAtPositionDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RenderCellAtPosition(5, 3, CellStatus.Alive, 10, 8);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("RenderCellAtPosition should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void RenderCellAtPositionHandlesDeadCell()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RenderCellAtPosition(2, 4, CellStatus.Dead, 15, 10);
+                Assert.IsTrue(true); // Should handle dead cells without exceptions
+            }
+            catch
+            {
+                Assert.Fail("RenderCellAtPosition should handle dead cells without exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void RenderCellAtPositionHandlesZeroOffset()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RenderCellAtPosition(0, 0, CellStatus.Alive, 0, 0);
+                Assert.IsTrue(true); // Should handle zero offset positioning
+            }
+            catch
+            {
+                Assert.Fail("RenderCellAtPosition should handle zero offset positioning");
+            }
+        }
+
+        [TestMethod]
+        public void RenderCellAtPositionHandlesLargeCoordinates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RenderCellAtPosition(50, 30, CellStatus.Dead, 100, 60);
+                Assert.IsTrue(true); // Should handle large coordinates gracefully
+            }
+            catch
+            {
+                Assert.Fail("RenderCellAtPosition should handle large coordinates gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void ClearGameAreaDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.ClearGameArea(10, 8, 15, 12);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("ClearGameArea should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void ClearGameAreaHandlesSmallArea()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.ClearGameArea(1, 1, 0, 0);
+                Assert.IsTrue(true); // Should handle minimal game area
+            }
+            catch
+            {
+                Assert.Fail("ClearGameArea should handle minimal game area");
+            }
+        }
+
+        [TestMethod]
+        public void ClearGameAreaHandlesLargeArea()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.ClearGameArea(50, 30, 5, 3);
+                Assert.IsTrue(true); // Should handle large game area
+            }
+            catch
+            {
+                Assert.Fail("ClearGameArea should handle large game area without exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void ClearGameAreaHandlesZeroPosition()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.ClearGameArea(15, 12, 0, 0);
+                Assert.IsTrue(true); // Should handle zero start position
+            }
+            catch
+            {
+                Assert.Fail("ClearGameArea should handle zero start position");
+            }
+        }
+
+        [TestMethod]
+        public void SetAnimationDelayAcceptsValidDelay()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.SetAnimationDelay(500);
+                Assert.IsTrue(true); // Should accept valid delay values
+            }
+            catch
+            {
+                Assert.Fail("SetAnimationDelay should accept valid delay values");
+            }
+        }
+
+        [TestMethod]
+        public void GetAnimationDelayReturnsDefaultValue()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            int defaultDelay = renderer.GetAnimationDelay();
+            Assert.AreEqual(500, defaultDelay, "Default animation delay should be 500ms");
+        }
+
+        [TestMethod]
+        public void SetAndGetAnimationDelayWorksCorrectly()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnimationDelay(750);
+            int delay = renderer.GetAnimationDelay();
+            Assert.AreEqual(750, delay, "Animation delay should return the set value");
+        }
+
+        [TestMethod]
+        public void SetAnimationDelayHandlesZeroDelay()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnimationDelay(0);
+            int delay = renderer.GetAnimationDelay();
+            Assert.AreEqual(0, delay, "Should accept zero delay for immediate rendering");
+        }
+
+        [TestMethod]
+        public void SetAnimationDelayHandlesLargeDelay()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnimationDelay(5000);
+            int delay = renderer.GetAnimationDelay();
+            Assert.AreEqual(5000, delay, "Should accept large delay values");
+        }
+
+        [TestMethod]
+        public void SetAnimationDelayRejectsNegativeValues()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.SetAnimationDelay(-100);
+                Assert.Fail("SetAnimationDelay should reject negative values");
+            }
+            catch (ArgumentException)
+            {
+                Assert.IsTrue(true); // Expected exception for negative values
+            }
+            catch
+            {
+                Assert.Fail("SetAnimationDelay should throw ArgumentException for negative values");
+            }
+        }
+
+        [TestMethod]
+        public void RenderBoardSmoothDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(5);
+            var previousBoard = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                renderer.RenderBoardSmooth(board, previousBoard, 10, 8);
+                Assert.IsTrue(true); // If we reach here, no exception was thrown
+            }
+            catch
+            {
+                Assert.Fail("RenderBoardSmooth should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void RenderBoardSmoothHandlesNullPreviousBoard()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                renderer.RenderBoardSmooth(board, null, 10, 8);
+                Assert.IsTrue(true); // Should handle null previous board (first render)
+            }
+            catch
+            {
+                Assert.Fail("RenderBoardSmooth should handle null previous board gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void RenderBoardSmoothHandlesSameSizeBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(10);
+            var previousBoard = new GameOfLifeBoard(10);
+            
+            try 
+            {
+                renderer.RenderBoardSmooth(board, previousBoard, 5, 3);
+                Assert.IsTrue(true); // Should handle same size boards
+            }
+            catch
+            {
+                Assert.Fail("RenderBoardSmooth should handle same size boards");
+            }
+        }
+
+        [TestMethod]
+        public void RenderBoardSmoothHandlesDifferentSizeBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(8);
+            var previousBoard = new GameOfLifeBoard(6);
+            
+            try 
+            {
+                renderer.RenderBoardSmooth(board, previousBoard, 12, 9);
+                Assert.IsTrue(true); // Should handle different size boards gracefully
+            }
+            catch
+            {
+                Assert.Fail("RenderBoardSmooth should handle different size boards gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void RenderBoardSmoothHandlesZeroOffset()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(3);
+            var previousBoard = new GameOfLifeBoard(3);
+            
+            try 
+            {
+                renderer.RenderBoardSmooth(board, previousBoard, 0, 0);
+                Assert.IsTrue(true); // Should handle zero offset positioning
+            }
+            catch
+            {
+                Assert.Fail("RenderBoardSmooth should handle zero offset positioning");
+            }
+        }
+
+        [TestMethod]
+        public void CalculateCellScreenPositionReturnsValidCoordinates()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (screenX, screenY) = renderer.CalculateCellScreenPosition(2, 3, 10, 8);
+            
+            Assert.AreEqual(12, screenX, "Cell screen X should be boardX + offsetX (2 + 10)");
+            Assert.AreEqual(11, screenY, "Cell screen Y should be boardY + offsetY (3 + 8)");
+        }
+
+        [TestMethod]
+        public void CalculateCellScreenPositionHandlesZeroOffset()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (screenX, screenY) = renderer.CalculateCellScreenPosition(5, 7, 0, 0);
+            
+            Assert.AreEqual(5, screenX, "Cell screen X with zero offset should equal board X");
+            Assert.AreEqual(7, screenY, "Cell screen Y with zero offset should equal board Y");
+        }
+
+        [TestMethod]
+        public void CalculateCellScreenPositionHandlesZeroPosition()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (screenX, screenY) = renderer.CalculateCellScreenPosition(0, 0, 15, 12);
+            
+            Assert.AreEqual(15, screenX, "Cell at origin should use offset X");
+            Assert.AreEqual(12, screenY, "Cell at origin should use offset Y");
+        }
+
+        [TestMethod]
+        public void HasCellChangedReturnsTrueForDifferentCells()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool changed = renderer.HasCellChanged(CellStatus.Alive, CellStatus.Dead);
+            Assert.IsTrue(changed, "Should return true when cells have different status");
+        }
+
+        [TestMethod]
+        public void HasCellChangedReturnsFalseForSameCells()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool changed = renderer.HasCellChanged(CellStatus.Alive, CellStatus.Alive);
+            Assert.IsFalse(changed, "Should return false when cells have same status");
+            
+            changed = renderer.HasCellChanged(CellStatus.Dead, CellStatus.Dead);
+            Assert.IsFalse(changed, "Should return false when both cells are dead");
+        }
+
+        [TestMethod]
+        public void GetDelayForSmoothRenderingReturnsConfiguredDelay()
+        {
+            var renderer = new ConsoleRenderer();
+            renderer.SetAnimationDelay(300);
+            
+            int delay = renderer.GetDelayForSmoothRendering();
+            Assert.AreEqual(300, delay, "Should return the configured animation delay");
+        }
+
+        [TestMethod]
+        public void ApplyAnimationDelayDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.ApplyAnimationDelay();
+                Assert.IsTrue(true); // Should not throw exceptions during delay
+            }
+            catch
+            {
+                Assert.Fail("ApplyAnimationDelay should not throw exceptions");
+            }
+        }
     }
 }
