@@ -598,5 +598,153 @@ namespace GameOfLifeTests
             Assert.IsTrue(width >= 10, "Optimal width should be at least 10 for playability");
             Assert.IsTrue(height >= 8, "Optimal height should be at least 8 for playability");
         }
+
+        // Additional centering logic tests for Phase 2 Step 5
+        [TestMethod]
+        public void CalculateCenterHandlesVerySmallTerminals()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(10, 8, 15, 12);
+            
+            Assert.AreEqual(2, x, "Small terminal should center 10-wide board at x=2 ((15-10)/2)");
+            Assert.AreEqual(2, y, "Small terminal should center 8-high board at y=2 ((12-8)/2)");
+        }
+
+        [TestMethod]
+        public void CalculateCenterHandlesVeryLargeBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(100, 50, 80, 25);
+            
+            Assert.AreEqual(0, x, "Large board in small terminal should be clamped to x=0");
+            Assert.AreEqual(0, y, "Large board in small terminal should be clamped to y=0");
+        }
+
+        [TestMethod]
+        public void CalculateCenterHandlesNegativeCenterCalculation()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Board larger than terminal results in negative center calculation
+            var (x, y) = renderer.CalculateBoardPosition(50, 30, 40, 20);
+            
+            Assert.AreEqual(0, x, "Negative center calculation should be clamped to 0 for x");
+            Assert.AreEqual(0, y, "Negative center calculation should be clamped to 0 for y");
+        }
+
+        [TestMethod]
+        public void CalculateCenterHandlesOddTerminalDimensions()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(10, 8, 81, 25);
+            
+            Assert.AreEqual(35, x, "Odd terminal width should center correctly ((81-10)/2 = 35)");
+            Assert.AreEqual(8, y, "Terminal height should center correctly ((25-8)/2 = 8)");
+        }
+
+        [TestMethod]
+        public void CalculateCenterHandlesEvenTerminalDimensions()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(11, 9, 80, 24);
+            
+            Assert.AreEqual(34, x, "Even terminal width should center correctly ((80-11)/2 = 34)");
+            Assert.AreEqual(7, y, "Even terminal height should center correctly ((24-9)/2 = 7)");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionHandlesBorderOffsetCorrectly()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(8, 6, 40, 20);
+            
+            // Board size 8x6, border adds 2 to each dimension = 10x8 total
+            Assert.AreEqual(15, x, "Centering with border should account for border size ((40-10)/2 = 15)");
+            Assert.AreEqual(6, y, "Centering with border should account for border size ((20-8)/2 = 6)");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionHandlesZeroDimensions()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(0, 0, 80, 25);
+            
+            // 0x0 board with 2x2 border = 2x2 total
+            Assert.AreEqual(39, x, "Zero-size board should center border correctly ((80-2)/2 = 39)");
+            Assert.AreEqual(11, y, "Zero-size board should center border correctly ((25-2)/2 = 11)");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionHandlesSingleCellBoard()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(1, 1, 80, 25);
+            
+            // 1x1 board with 2x2 border = 3x3 total
+            Assert.AreEqual(38, x, "Single cell board should center correctly ((80-3)/2 = 38)");
+            Assert.AreEqual(11, y, "Single cell board should center correctly ((25-3)/2 = 11)");
+        }
+
+        [TestMethod]
+        public void CalculateCenteredBoardPositionHandlesMaximumBoardSize()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateCenteredBoardPosition(78, 23, 80, 25);
+            
+            // 78x23 board with 2x2 border = 80x25 total (exact fit)
+            Assert.AreEqual(0, x, "Maximum board size should result in x=0 for exact fit");
+            Assert.AreEqual(0, y, "Maximum board size should result in y=0 for exact fit");
+        }
+
+        [TestMethod]
+        public void IsBoardTooLargeForTerminalHandlesEdgeCaseExactBorderFit()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool exactFit = renderer.IsBoardTooLargeForTerminal(78, 23, 80, 25);
+            Assert.IsFalse(exactFit, "Board that exactly fits with borders should not be too large");
+        }
+
+        [TestMethod]
+        public void IsBoardTooLargeForTerminalHandlesOnePixelOver()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool tooLarge = renderer.IsBoardTooLargeForTerminal(79, 23, 80, 25);
+            Assert.IsTrue(tooLarge, "Board one pixel too wide should be too large (79+2=81 > 80)");
+            
+            tooLarge = renderer.IsBoardTooLargeForTerminal(78, 24, 80, 25);
+            Assert.IsTrue(tooLarge, "Board one pixel too high should be too large (24+2=26 > 25)");
+        }
+
+        [TestMethod]
+        public void CalculateCenterWithVeryWideBoard()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(200, 5, 80, 25);
+            
+            Assert.AreEqual(0, x, "Very wide board should be clamped to x=0");
+            Assert.AreEqual(10, y, "Narrow board should still center vertically ((25-5)/2 = 10)");
+        }
+
+        [TestMethod]
+        public void CalculateCenterWithVeryTallBoard()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            var (x, y) = renderer.CalculateBoardPosition(5, 100, 80, 25);
+            
+            Assert.AreEqual(37, x, "Narrow board should center horizontally ((80-5)/2 = 37)");
+            Assert.AreEqual(0, y, "Very tall board should be clamped to y=0");
+        }
     }
 }
