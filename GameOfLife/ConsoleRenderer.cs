@@ -7,6 +7,7 @@ namespace GameOfLife
     {
         private bool _originalCursorVisible;
         private Encoding _originalEncoding;
+        private int _animationDelay = 500; // Default 500ms delay for smooth rendering
 
         public void InitializeConsole()
         {
@@ -360,6 +361,138 @@ namespace GameOfLife
             int optimalHeight = Math.Max(8, Math.Min(availableHeight, 30));
             
             return (optimalWidth, optimalHeight);
+        }
+
+        // Phase 3 Step 6: Smooth rendering methods
+        
+        public void RenderCellAtPosition(int cellX, int cellY, CellStatus cellStatus, int boardOffsetX, int boardOffsetY)
+        {
+            try
+            {
+                // Calculate the actual screen position for this cell
+                var (screenX, screenY) = CalculateCellScreenPosition(cellX, cellY, boardOffsetX, boardOffsetY);
+                
+                // Move cursor to the cell position and render the cell
+                MoveCursorToPosition(screenX, screenY);
+                Console.Write(RenderCell(cellStatus));
+            }
+            catch (Exception)
+            {
+                // Handle case where cursor positioning or cell rendering fails
+                // This might happen when output is redirected or on unsupported terminals
+            }
+        }
+
+        public void ClearGameArea(int boardWidth, int boardHeight, int startX, int startY)
+        {
+            try
+            {
+                // Clear each row of the game area with spaces
+                for (int row = 0; row < boardHeight; row++)
+                {
+                    MoveCursorToPosition(startX, startY + row);
+                    
+                    // Write spaces to clear the entire row
+                    string clearRow = new string(' ', boardWidth);
+                    Console.Write(clearRow);
+                }
+            }
+            catch (Exception)
+            {
+                // Handle case where area clearing fails
+                // This might happen when output is redirected or on unsupported terminals
+            }
+        }
+
+        public void SetAnimationDelay(int milliseconds)
+        {
+            if (milliseconds < 0)
+            {
+                throw new ArgumentException("Animation delay cannot be negative", nameof(milliseconds));
+            }
+            _animationDelay = milliseconds;
+        }
+
+        public int GetAnimationDelay()
+        {
+            return _animationDelay;
+        }
+
+        public int GetDelayForSmoothRendering()
+        {
+            return _animationDelay;
+        }
+
+        public void ApplyAnimationDelay()
+        {
+            try
+            {
+                if (_animationDelay > 0)
+                {
+                    System.Threading.Thread.Sleep(_animationDelay);
+                }
+            }
+            catch (Exception)
+            {
+                // Handle case where thread sleep fails
+                // Continue execution without delay
+            }
+        }
+
+        public void RenderBoardSmooth(GameOfLifeBoard board, GameOfLifeBoard previousBoard, int startX, int startY)
+        {
+            try
+            {
+                // If no previous board, render all cells
+                if (previousBoard == null)
+                {
+                    // Render the entire board from scratch
+                    for (int x = 0; x < board.Size; x++)
+                    {
+                        for (int y = 0; y < board.Size; y++)
+                        {
+                            RenderCellAtPosition(x, y, board.GetCell(x, y), startX, startY);
+                        }
+                    }
+                }
+                else
+                {
+                    // Only update cells that have changed between generations
+                    int maxSize = Math.Max(board.Size, previousBoard.Size);
+                    
+                    for (int x = 0; x < maxSize; x++)
+                    {
+                        for (int y = 0; y < maxSize; y++)
+                        {
+                            CellStatus currentCell = (x < board.Size && y < board.Size) ? 
+                                board.GetCell(x, y) : CellStatus.Dead;
+                            CellStatus previousCell = (x < previousBoard.Size && y < previousBoard.Size) ? 
+                                previousBoard.GetCell(x, y) : CellStatus.Dead;
+                            
+                            // Only render if the cell has changed
+                            if (HasCellChanged(currentCell, previousCell))
+                            {
+                                RenderCellAtPosition(x, y, currentCell, startX, startY);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Handle case where smooth rendering fails
+                // This might happen when output is redirected or on unsupported terminals
+            }
+        }
+
+        public (int screenX, int screenY) CalculateCellScreenPosition(int boardX, int boardY, int offsetX, int offsetY)
+        {
+            return (boardX + offsetX, boardY + offsetY);
+        }
+
+        public bool HasCellChanged(CellStatus current, CellStatus previous)
+        {
+            return current != previous;
         }
     }
 }
