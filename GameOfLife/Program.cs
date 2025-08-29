@@ -192,7 +192,7 @@ namespace GameOfLife
         static void Main()
         {
             // Use new renderer-based game loop for enhanced graphics
-            RunGameWithRenderer(30, 30);
+            RunGameWithRenderer(30, 10, 30);
         }
 
     }
