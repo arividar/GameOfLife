@@ -62,9 +62,9 @@ namespace GameOfLife
         public static void PrintBoard(int generation, GameOfLifeBoard board)
         {
             Console.WriteLine("Generation: "+generation.ToString(CultureInfo.InvariantCulture));
-            for (int x = 0; x < board.Size; x++)
+            for (int x = 0; x < board.Width; x++)
             {
-                for (int y = 0; y < board.Size; y++)
+                for (int y = 0; y < board.Height; y++)
                 { 
                     Console.Write(board.GetCell(x, y) == CellStatus.Dead ? " . " : " O ");
                 }
@@ -85,7 +85,7 @@ namespace GameOfLife
                 renderer.InitializeConsole();
                 
                 // Calculate centered position for the board
-                var (boardX, boardY) = renderer.CalculateCenteredBoardPosition(board.Size, board.Size);
+                var (boardX, boardY) = renderer.CalculateCenteredBoardPosition(board.Width, board.Height);
                 
                 // Render generation counter at top
                 renderer.RenderGenerationCounterAtTop(generation, boardX, boardY);
@@ -113,9 +113,14 @@ namespace GameOfLife
 
         public static void RunGameWithRenderer(int boardSize, int maxGenerations)
         {
+            RunGameWithRenderer(boardSize, boardSize, maxGenerations);
+        }
+
+        public static void RunGameWithRenderer(int width, int height, int maxGenerations)
+        {
             try
             {
-                var board = new GameOfLifeBoard(boardSize);
+                var board = new GameOfLifeBoard(width, height);
                 var renderer = CreateRendererWithConfiguration();
                 
                 SetGenerationZero(board);
