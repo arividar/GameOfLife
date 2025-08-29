@@ -21,7 +21,10 @@ namespace GameOfLife
             try
             {
                 // Store original state for restoration
-                _originalCursorVisible = Console.CursorVisible;
+                if (OperatingSystem.IsWindows())
+                {
+                    _originalCursorVisible = Console.CursorVisible;
+                }
                 _originalEncoding = Console.OutputEncoding;
                 
                 // Set UTF-8 encoding for Unicode support
@@ -45,7 +48,10 @@ namespace GameOfLife
             try
             {
                 // Restore original console state
-                Console.CursorVisible = _originalCursorVisible;
+                if (OperatingSystem.IsWindows())
+                {
+                    Console.CursorVisible = _originalCursorVisible;
+                }
                 Console.OutputEncoding = _originalEncoding ?? Console.OutputEncoding;
             }
             catch (Exception)
@@ -110,7 +116,10 @@ namespace GameOfLife
         {
             try
             {
-                Console.CursorVisible = false;
+                if (OperatingSystem.IsWindows())
+                {
+                    Console.CursorVisible = false;
+                }
             }
             catch (Exception)
             {
@@ -123,7 +132,10 @@ namespace GameOfLife
         {
             try
             {
-                Console.CursorVisible = true;
+                if (OperatingSystem.IsWindows())
+                {
+                    Console.CursorVisible = true;
+                }
             }
             catch (Exception)
             {
