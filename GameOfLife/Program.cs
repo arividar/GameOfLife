@@ -111,11 +111,6 @@ namespace GameOfLife
             return renderer;
         }
 
-        public static void RunGameWithRenderer(int boardSize, int maxGenerations)
-        {
-            RunGameWithRenderer(boardSize*3, boardSize, maxGenerations);
-        }
-
         public static void RunGameWithRenderer(int width, int height, int maxGenerations)
         {
             try

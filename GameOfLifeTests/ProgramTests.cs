@@ -155,7 +155,7 @@ namespace GameOfLifeTests
         {
             try
             {
-                Program.RunGameWithRenderer(5, 3); // Small board, few generations
+                Program.RunGameWithRenderer(5, 5, 3); // Small board, few generations
                 Assert.IsTrue(true); // Should complete without exceptions
             }
             catch
@@ -169,7 +169,7 @@ namespace GameOfLifeTests
         {
             try
             {
-                Program.RunGameWithRenderer(5, 0); // Zero generations should just show initial state
+                Program.RunGameWithRenderer(5, 5, 0); // Zero generations should just show initial state
                 Assert.IsTrue(true); // Should handle zero generations
             }
             catch
@@ -183,7 +183,7 @@ namespace GameOfLifeTests
         {
             try
             {
-                Program.RunGameWithRenderer(1, 2); // Minimum board size
+                Program.RunGameWithRenderer(1, 1, 2); // Minimum board size
                 Assert.IsTrue(true); // Should handle small boards
             }
             catch
