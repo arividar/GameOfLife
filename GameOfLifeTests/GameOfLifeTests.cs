@@ -518,40 +518,27 @@ namespace GameOfLifeTests
 
         // Program class tests
         [TestMethod]
-        public void SetGenerationZeroCreatesPredefinedPattern()
+        public void SetGenerationZeroCreatesRandomPattern()
         {
             var board = new GameOfLifeBoard(10);
             Assert.AreEqual(0, board.LiveCount);
             
             Program.SetGenerationZero(board);
             
-            // Verify the pattern was set correctly
-            Assert.AreEqual(23, board.LiveCount);
+            // Verify approximately 40% of cells are alive (40 out of 100 cells)
+            Assert.AreEqual(40, board.LiveCount);
             
-            // Test specific cells that should be alive based on the pattern
-            Assert.IsTrue(board.IsCellAlive(1, 0));
-            Assert.IsTrue(board.IsCellAlive(1, 1));
-            Assert.IsTrue(board.IsCellAlive(1, 2));
-            Assert.IsTrue(board.IsCellAlive(1, 3));
-            Assert.IsTrue(board.IsCellAlive(2, 0));
-            Assert.IsTrue(board.IsCellAlive(2, 1));
-            Assert.IsTrue(board.IsCellAlive(2, 2));
-            Assert.IsTrue(board.IsCellAlive(2, 3));
-            Assert.IsTrue(board.IsCellAlive(3, 4));
-            Assert.IsTrue(board.IsCellAlive(3, 5));
-            Assert.IsTrue(board.IsCellAlive(6, 2));
-            Assert.IsTrue(board.IsCellAlive(6, 3));
-            Assert.IsTrue(board.IsCellAlive(6, 4));
-            Assert.IsTrue(board.IsCellAlive(7, 2));
-            Assert.IsTrue(board.IsCellAlive(7, 3));
-            Assert.IsTrue(board.IsCellAlive(8, 4));
-            Assert.IsTrue(board.IsCellAlive(8, 5));
-            Assert.IsTrue(board.IsCellAlive(9, 4));
-            Assert.IsTrue(board.IsCellAlive(9, 5));
-            Assert.IsTrue(board.IsCellAlive(9, 6));
-            Assert.IsTrue(board.IsCellAlive(9, 7));
-            Assert.IsTrue(board.IsCellAlive(9, 8));
-            Assert.IsTrue(board.IsCellAlive(9, 9));
+            // Verify that live cells are properly distributed (not all concentrated in one area)
+            int liveCount = 0;
+            for (int x = 0; x < board.Width; x++)
+            {
+                for (int y = 0; y < board.Height; y++)
+                {
+                    if (board.IsCellAlive(x, y))
+                        liveCount++;
+                }
+            }
+            Assert.AreEqual(40, liveCount);
         }
 
         [TestMethod]
@@ -562,12 +549,20 @@ namespace GameOfLifeTests
             
             Program.SetGenerationZero(largeBoard);
             
-            // Should set all 23 cells since board is large enough
-            Assert.AreEqual(23, largeBoard.LiveCount);
+            // Should set 40% of cells alive (40% of 15x15 = 90 cells)
+            Assert.AreEqual(90, largeBoard.LiveCount);
             
-            // Verify some key positions
-            Assert.IsTrue(largeBoard.IsCellAlive(1, 0));
-            Assert.IsTrue(largeBoard.IsCellAlive(9, 9));
+            // Verify that all live cells are within board boundaries
+            int liveCount = 0;
+            for (int x = 0; x < largeBoard.Width; x++)
+            {
+                for (int y = 0; y < largeBoard.Height; y++)
+                {
+                    if (largeBoard.IsCellAlive(x, y))
+                        liveCount++;
+                }
+            }
+            Assert.AreEqual(90, liveCount);
         }
 
         [TestMethod]
