@@ -113,7 +113,7 @@ namespace GameOfLife
 
         public static void RunGameWithRenderer(int boardSize, int maxGenerations)
         {
-            RunGameWithRenderer(boardSize, boardSize, maxGenerations);
+            RunGameWithRenderer(boardSize*3, boardSize, maxGenerations);
         }
 
         public static void RunGameWithRenderer(int width, int height, int maxGenerations)
@@ -192,7 +192,7 @@ namespace GameOfLife
         static void Main()
         {
             // Use new renderer-based game loop for enhanced graphics
-            RunGameWithRenderer(10, 20);
+            RunGameWithRenderer(30, 30);
         }
 
     }
