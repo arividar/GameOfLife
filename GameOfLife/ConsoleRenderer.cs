@@ -454,9 +454,9 @@ namespace GameOfLife
                 if (previousBoard == null)
                 {
                     // Render the entire board from scratch
-                    for (int x = 0; x < board.Size; x++)
+                    for (int x = 0; x < board.Width; x++)
                     {
-                        for (int y = 0; y < board.Size; y++)
+                        for (int y = 0; y < board.Height; y++)
                         {
                             RenderCellAtPosition(x, y, board.GetCell(x, y), startX, startY);
                         }
@@ -465,15 +465,16 @@ namespace GameOfLife
                 else
                 {
                     // Only update cells that have changed between generations
-                    int maxSize = Math.Max(board.Size, previousBoard.Size);
+                    int maxWidth = Math.Max(board.Width, previousBoard.Width);
+                    int maxHeight = Math.Max(board.Height, previousBoard.Height);
                     
-                    for (int x = 0; x < maxSize; x++)
+                    for (int x = 0; x < maxWidth; x++)
                     {
-                        for (int y = 0; y < maxSize; y++)
+                        for (int y = 0; y < maxHeight; y++)
                         {
-                            CellStatus currentCell = (x < board.Size && y < board.Size) ? 
+                            CellStatus currentCell = (x < board.Width && y < board.Height) ? 
                                 board.GetCell(x, y) : CellStatus.Dead;
-                            CellStatus previousCell = (x < previousBoard.Size && y < previousBoard.Size) ? 
+                            CellStatus previousCell = (x < previousBoard.Width && y < previousBoard.Height) ? 
                                 previousBoard.GetCell(x, y) : CellStatus.Dead;
                             
                             // Only render if the cell has changed
@@ -509,7 +510,7 @@ namespace GameOfLife
             try
             {
                 // Draw border around the board
-                DrawBorder(board.Size, board.Size, offsetX, offsetY);
+                DrawBorder(board.Width, board.Height, offsetX, offsetY);
                 
                 // Render the board content inside the border using smooth rendering
                 RenderBoardSmooth(board, null, offsetX + 1, offsetY + 1);
@@ -520,9 +521,9 @@ namespace GameOfLife
                 // Fall back to basic board rendering
                 try
                 {
-                    for (int x = 0; x < board.Size; x++)
+                    for (int x = 0; x < board.Width; x++)
                     {
-                        for (int y = 0; y < board.Size; y++)
+                        for (int y = 0; y < board.Height; y++)
                         {
                             MoveCursorToPosition(offsetX + y, offsetY + x);
                             Console.Write(RenderCell(board.GetCell(x, y)));

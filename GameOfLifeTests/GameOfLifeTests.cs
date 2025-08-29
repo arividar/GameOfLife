@@ -13,6 +13,127 @@ namespace GameOfLifeTests
             Assert.AreEqual(10, board.Size);
         }
 
+        // Rectangular Board Tests
+
+        [TestMethod]
+        public void CreateRectangularBoardShouldHaveCorrectDimensions()
+        {
+            var board = new GameOfLifeBoard(8, 12);
+            Assert.AreEqual(8, board.Width, "Board width should be 8");
+            Assert.AreEqual(12, board.Height, "Board height should be 12");
+        }
+
+        [TestMethod]
+        public void CreateRectangularBoardShouldBeAllDead()
+        {
+            var board = new GameOfLifeBoard(5, 7);
+            Assert.AreEqual(0, board.LiveCount, "New rectangular board should have no live cells");
+        }
+
+        [TestMethod]
+        public void RectangularBoardCanSetCellsAlive()
+        {
+            var board = new GameOfLifeBoard(6, 4);
+            
+            board.SetCellAlive(2, 1);
+            board.SetCellAlive(4, 3);
+            
+            Assert.AreEqual(CellStatus.Alive, board.GetCell(2, 1), "Cell (2,1) should be alive");
+            Assert.AreEqual(CellStatus.Alive, board.GetCell(4, 3), "Cell (4,3) should be alive");
+            Assert.AreEqual(2, board.LiveCount, "Should have 2 live cells");
+        }
+
+        [TestMethod]
+        public void RectangularBoardHandlesBoundaryChecks()
+        {
+            var board = new GameOfLifeBoard(3, 5);
+            
+            // Test all boundary conditions
+            Assert.IsFalse(board.IsCellAlive(-1, 0), "Negative X should be dead");
+            Assert.IsFalse(board.IsCellAlive(0, -1), "Negative Y should be dead");
+            Assert.IsFalse(board.IsCellAlive(3, 2), "X >= width should be dead");
+            Assert.IsFalse(board.IsCellAlive(1, 5), "Y >= height should be dead");
+            Assert.IsFalse(board.IsCellAlive(10, 10), "Far out of bounds should be dead");
+        }
+
+        [TestMethod]
+        public void RectangularBoardCalculatesNeighborsCorrectly()
+        {
+            var board = new GameOfLifeBoard(5, 4);
+            
+            // Set up a pattern: center cell with neighbors
+            board.SetCellAlive(1, 1); // Top-left of center
+            board.SetCellAlive(2, 1); // Top of center
+            board.SetCellAlive(3, 1); // Top-right of center
+            board.SetCellAlive(1, 2); // Left of center
+            // (2, 2) is the center - leave dead
+            board.SetCellAlive(3, 2); // Right of center
+            
+            int neighbors = board.LiveNeighbourCount(2, 2);
+            Assert.AreEqual(5, neighbors, "Center cell should have 5 live neighbors");
+        }
+
+        [TestMethod]
+        public void RectangularBoardNextGenerationWorksCorrectly()
+        {
+            var board = new GameOfLifeBoard(5, 5);
+            
+            // Create a blinker pattern (vertical line that oscillates)
+            board.SetCellAlive(2, 1);
+            board.SetCellAlive(2, 2);
+            board.SetCellAlive(2, 3);
+            
+            var nextGen = board.NextGenerationBoard();
+            
+            // After one generation, blinker should be horizontal
+            Assert.AreEqual(CellStatus.Dead, nextGen.GetCell(2, 1), "Top of blinker should die");
+            Assert.AreEqual(CellStatus.Alive, nextGen.GetCell(1, 2), "Left of center should be born");
+            Assert.AreEqual(CellStatus.Alive, nextGen.GetCell(2, 2), "Center should stay alive");
+            Assert.AreEqual(CellStatus.Alive, nextGen.GetCell(3, 2), "Right of center should be born");
+            Assert.AreEqual(CellStatus.Dead, nextGen.GetCell(2, 3), "Bottom of blinker should die");
+        }
+
+        [TestMethod]
+        public void RectangularBoardHandlesEdgeCellsCorrectly()
+        {
+            var board = new GameOfLifeBoard(3, 3);
+            
+            // Set corner cell alive
+            board.SetCellAlive(0, 0);
+            
+            int neighbors = board.LiveNeighbourCount(0, 0);
+            Assert.AreEqual(0, neighbors, "Corner cell should have 0 neighbors when alone");
+            
+            // Add neighbor
+            board.SetCellAlive(0, 1);
+            neighbors = board.LiveNeighbourCount(0, 0);
+            Assert.AreEqual(1, neighbors, "Corner cell should have 1 neighbor");
+        }
+
+        [TestMethod]
+        public void RectangularBoardDimensionsAreIndependent()
+        {
+            var board = new GameOfLifeBoard(10, 3); // Wide but short
+            
+            // Test that we can access the full width
+            board.SetCellAlive(9, 0);
+            board.SetCellAlive(9, 2);
+            Assert.AreEqual(CellStatus.Alive, board.GetCell(9, 0), "Should access rightmost column");
+            Assert.AreEqual(CellStatus.Alive, board.GetCell(9, 2), "Should access bottom-right corner");
+            
+            // Test that height is properly limited
+            Assert.IsFalse(board.IsCellAlive(5, 3), "Should not access beyond height");
+        }
+
+        [TestMethod]
+        public void SquareBoardConstructorStillWorksForBackwardCompatibility()
+        {
+            var board = new GameOfLifeBoard(7);
+            Assert.AreEqual(7, board.Width, "Square board width should be 7");
+            Assert.AreEqual(7, board.Height, "Square board height should be 7");
+            Assert.AreEqual(7, board.Size, "Size property should still work for square boards");
+        }
+
         [TestMethod]
         public void SetCellBringsACellToLife()
         {

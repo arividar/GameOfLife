@@ -1,16 +1,26 @@
-﻿namespace GameOfLife
+﻿using System;
+
+namespace GameOfLife
 {
     public enum CellStatus { Alive, Dead }
 
     public class GameOfLifeBoard
     {
         private readonly CellStatus[,] _board;
+        private readonly int _width;
+        private readonly int _height;
 
+        public int Width => _width;
+        public int Height => _height;
+        
+        // Keep Size property for backward compatibility with square boards
         public int Size
         {
             get
             {
-                return _board.GetUpperBound(0) + 1;
+                if (_width != _height)
+                    throw new InvalidOperationException("Size property is only valid for square boards. Use Width and Height for rectangular boards.");
+                return _width;
             }
         }
 
@@ -19,20 +29,29 @@
             get
             {
                 int liveCount = 0;
-                for (int i = 0; i < Size; i++)
-                    for (int h = 0; h < Size; h++)
-                        if (_board[i, h] == CellStatus.Alive)
+                for (int x = 0; x < _width; x++)
+                    for (int y = 0; y < _height; y++)
+                        if (_board[x, y] == CellStatus.Alive)
                             liveCount++;
                 return liveCount;
             }
         }
 
-        public GameOfLifeBoard(int size)
+        // Square board constructor for backward compatibility
+        public GameOfLifeBoard(int size) : this(size, size)
         {
-            _board = new CellStatus[size, size];
-            for (int i = 0; i < size; i++)
-                for (int h = 0; h < size; h++)
-                    _board[i, h] = CellStatus.Dead;
+        }
+        
+        // Rectangular board constructor
+        public GameOfLifeBoard(int width, int height)
+        {
+            _width = width;
+            _height = height;
+            _board = new CellStatus[width, height];
+            
+            for (int x = 0; x < _width; x++)
+                for (int y = 0; y < _height; y++)
+                    _board[x, y] = CellStatus.Dead;
         }
 
         public void SetCellAlive(int x, int y)
@@ -52,9 +71,9 @@
 
         public GameOfLifeBoard NextGenerationBoard()
         {
-            var nextGenBoard = new GameOfLifeBoard(Size);
-            for (int x = 0; x < Size; x++)
-                for (int y = 0; y < Size; y++)
+            var nextGenBoard = new GameOfLifeBoard(_width, _height);
+            for (int x = 0; x < _width; x++)
+                for (int y = 0; y < _height; y++)
                 {
                     nextGenBoard.SetCell(x, y, NextGenerationCell(x, y));
                 }
@@ -95,7 +114,7 @@
 
         public bool IsCellAlive(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= Size || y >= Size)
+            if (x < 0 || y < 0 || x >= _width || y >= _height)
                 return false;
             return (_board[x, y] == CellStatus.Alive);
         }
