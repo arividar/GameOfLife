@@ -34,29 +34,22 @@ namespace GameOfLife
     {
         public static void SetGenerationZero(GameOfLifeBoard theBoard)
         {
-            theBoard.SetCellAlive(1, 0);
-            theBoard.SetCellAlive(1, 1);
-            theBoard.SetCellAlive(1, 2);
-            theBoard.SetCellAlive(1, 3);
-            theBoard.SetCellAlive(2, 0);
-            theBoard.SetCellAlive(2, 1);
-            theBoard.SetCellAlive(2, 2);
-            theBoard.SetCellAlive(2, 3);
-            theBoard.SetCellAlive(3, 4);
-            theBoard.SetCellAlive(3, 5);
-            theBoard.SetCellAlive(6, 2);
-            theBoard.SetCellAlive(6, 3);
-            theBoard.SetCellAlive(6, 4);
-            theBoard.SetCellAlive(7, 2);
-            theBoard.SetCellAlive(7, 3);
-            theBoard.SetCellAlive(8, 4);
-            theBoard.SetCellAlive(8, 5);
-            theBoard.SetCellAlive(9, 4);
-            theBoard.SetCellAlive(9, 5);
-            theBoard.SetCellAlive(9, 6);
-            theBoard.SetCellAlive(9, 7);
-            theBoard.SetCellAlive(9, 8);
-            theBoard.SetCellAlive(9, 9);
+            Random random = new Random();
+            int totalCells = theBoard.Width * theBoard.Height;
+            int targetLiveCells = (int)(totalCells * 0.4); // 40% of board size
+            
+            int liveCellsPlaced = 0;
+            while (liveCellsPlaced < targetLiveCells)
+            {
+                int x = random.Next(theBoard.Width);
+                int y = random.Next(theBoard.Height);
+                
+                if (theBoard.GetCell(x, y) == CellStatus.Dead)
+                {
+                    theBoard.SetCellAlive(x, y);
+                    liveCellsPlaced++;
+                }
+            }
         }
 
         public static void PrintBoard(int generation, GameOfLifeBoard board)
