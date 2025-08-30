@@ -185,6 +185,7 @@ namespace GameOfLife
         {
             // Use new renderer-based game loop for enhanced graphics
             RunGameWithRenderer(30, 10, 30);
+            Console.ReadLine();
         }
 
     }
