@@ -118,10 +118,11 @@ namespace GameOfLife
 
         public static void RunGameWithRenderer(int width, int height, int maxGenerations)
         {
+            ConsoleRenderer renderer = null;
             try
             {
                 var board = new GameOfLifeBoard(width, height);
-                var renderer = CreateRendererWithConfiguration();
+                renderer = CreateRendererWithConfiguration();
                 
                 SetGenerationZero(board);
                 
@@ -133,13 +134,16 @@ namespace GameOfLife
                         board = board.NextGenerationBoard();
                     }
                 }
-                
-                renderer.RestoreConsole();
             }
             catch (Exception)
             {
                 // Handle any exceptions gracefully for tests
                 // In a real application, we might want to log or display the error
+            }
+            finally
+            {
+                // Always restore console state, even if an exception occurred
+                renderer?.RestoreConsole();
             }
         }
 
@@ -191,8 +195,9 @@ namespace GameOfLife
         [ExcludeFromCodeCoverage]
         static void Main()
         {
-            // Use new renderer-based game loop for enhanced graphics
-            RunGameWithRenderer(30, 30);
+            // Use new renderer-based game loop for enhanced graphics with rectangular board
+            // 15x10 board (width x height) for 20 generations
+            RunGameWithRenderer(15, 10, 20);
         }
 
     }
