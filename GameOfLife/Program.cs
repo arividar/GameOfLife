@@ -195,9 +195,9 @@ namespace GameOfLife
         [ExcludeFromCodeCoverage]
         static void Main()
         {
-            // Use new renderer-based game loop for enhanced graphics with rectangular board
-            // 15x10 board (width x height) for 20 generations
-            RunGameWithRenderer(15, 10, 20);
+            // Use new renderer-based game loop for enhanced graphics
+            // 30x20 board for 20 generations
+            RunGameWithRenderer(30, 20, 20);
         }
 
     }

@@ -111,6 +111,11 @@ namespace GameOfLife
             try
             {
                 Console.CursorVisible = false;
+                
+                // Also try to move cursor to a position outside the visible area
+                // This helps on terminals where CursorVisible doesn't work reliably
+                var (width, height) = GetTerminalSize();
+                Console.SetCursorPosition(0, height - 1);
             }
             catch (Exception)
             {
@@ -438,11 +443,29 @@ namespace GameOfLife
                 {
                     System.Threading.Thread.Sleep(_animationDelay);
                 }
+                
+                // Re-hide cursor after delay in case it became visible during rendering
+                EnsureCursorHidden();
             }
             catch (Exception)
             {
                 // Handle case where thread sleep fails
                 // Continue execution without delay
+            }
+        }
+        
+        public void EnsureCursorHidden()
+        {
+            try
+            {
+                Console.CursorVisible = false;
+                
+                // Move cursor to top-left corner to minimize visibility
+                Console.SetCursorPosition(0, 0);
+            }
+            catch (Exception)
+            {
+                // Handle case where cursor control fails
             }
         }
 
@@ -485,6 +508,9 @@ namespace GameOfLife
                         }
                     }
                 }
+                
+                // Ensure cursor remains hidden after rendering
+                EnsureCursorHidden();
             }
             catch (Exception)
             {
