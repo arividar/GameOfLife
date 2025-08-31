@@ -163,7 +163,7 @@ namespace GameOfLife
         public bool IsTerminalSizeValid(int width, int height)
         {
             // Define minimum requirements for Game of Life display
-            const int MIN_WIDTH = 15;  // Minimum for 10x10 board + borders
+            const int MIN_WIDTH = 24;  // Minimum for 10x10 board (20 chars) + borders (2) + margin (2)
             const int MIN_HEIGHT = 12; // Minimum for 10x10 board + borders + generation info
             
             return width >= MIN_WIDTH && height >= MIN_HEIGHT;
@@ -265,12 +265,12 @@ namespace GameOfLife
 
         public string GetAliveCellCharacter()
         {
-            return _useUnicodeCharacters ? "█" : "O";
+            return _useUnicodeCharacters ? "██" : "OO";
         }
 
         public string GetDeadCellCharacter()
         {
-            return _useUnicodeCharacters ? "·" : ".";
+            return _useUnicodeCharacters ? "··" : "..";
         }
 
         public string GetAliveCellColor()
@@ -369,7 +369,7 @@ namespace GameOfLife
 
         public (int width, int height) CalculateBorderDimensions(int boardWidth, int boardHeight)
         {
-            return (boardWidth + 2, boardHeight + 2);
+            return (boardWidth * 2 + 2, boardHeight + 2);
         }
 
         public void DrawBorder(int boardWidth, int boardHeight, int startX, int startY)
@@ -381,7 +381,7 @@ namespace GameOfLife
                 // Draw top border
                 MoveCursorToPosition(startX, startY);
                 Console.Write(GetTopLeftBorderCharacter());
-                for (int i = 0; i < boardWidth; i++)
+                for (int i = 0; i < boardWidth * 2; i++)
                 {
                     Console.Write(GetHorizontalBorderCharacter());
                 }
@@ -399,7 +399,7 @@ namespace GameOfLife
                 // Draw bottom border
                 MoveCursorToPosition(startX, startY + borderHeight - 1);
                 Console.Write(GetBottomLeftBorderCharacter());
-                for (int i = 0; i < boardWidth; i++)
+                for (int i = 0; i < boardWidth * 2; i++)
                 {
                     Console.Write(GetHorizontalBorderCharacter());
                 }
@@ -457,11 +457,11 @@ namespace GameOfLife
         public (int width, int height) GetOptimalBoardSizeForTerminal(int terminalWidth, int terminalHeight)
         {
             // Leave room for borders (2 extra) plus some margin for readability
-            int availableWidth = terminalWidth - 4; // Border + 2 margin
+            int availableWidth = (terminalWidth - 4) / 2; // Divide by 2 for double-width cells, Border + 2 margin
             int availableHeight = terminalHeight - 4; // Border + 2 margin
             
             // Ensure minimum playable size
-            int optimalWidth = Math.Max(10, Math.Min(availableWidth, 50));
+            int optimalWidth = Math.Max(10, Math.Min(availableWidth, 25));
             int optimalHeight = Math.Max(8, Math.Min(availableHeight, 30));
             
             return (optimalWidth, optimalHeight);
@@ -613,7 +613,7 @@ namespace GameOfLife
 
         public (int screenX, int screenY) CalculateCellScreenPosition(int boardX, int boardY, int offsetX, int offsetY)
         {
-            return (boardX + offsetX, boardY + offsetY);
+            return (boardX * 2 + offsetX, boardY + offsetY);
         }
 
         public bool HasCellChanged(CellStatus current, CellStatus previous)

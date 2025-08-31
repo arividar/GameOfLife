@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameOfLife;
 
 namespace GameOfLifeTests
@@ -616,6 +617,138 @@ namespace GameOfLifeTests
             catch
             {
                 Assert.Fail("PrintBoard should handle large boards without throwing exceptions");
+            }
+        }
+
+        // Additional tests for improved coverage
+
+        [TestMethod]
+        public void SizePropertyThrowsForRectangularBoard()
+        {
+            var rectangularBoard = new GameOfLifeBoard(5, 10); // Width != Height
+            
+            Assert.ThrowsException<InvalidOperationException>(() =>
+            {
+                int size = rectangularBoard.Size;
+            });
+        }
+
+        [TestMethod]
+        public void SizePropertyWorksForSquareBoard()
+        {
+            var squareBoard = new GameOfLifeBoard(10); // Square board using single-parameter constructor
+            
+            Assert.AreEqual(10, squareBoard.Size);
+        }
+
+        [TestMethod]
+        public void RectangularBoardConstructorWorksCorrectly()
+        {
+            var board = new GameOfLifeBoard(6, 4);
+            
+            Assert.AreEqual(6, board.Width);
+            Assert.AreEqual(4, board.Height);
+            Assert.AreEqual(0, board.LiveCount);
+        }
+
+        [TestMethod]
+        public void PrintBoardWithRendererHandlesNullBoard()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                Program.PrintBoardWithRenderer(1, null, new ConsoleRenderer());
+            });
+        }
+
+        [TestMethod]
+        public void PrintBoardWithRendererHandlesNullRenderer()
+        {
+            var board = new GameOfLifeBoard(5);
+            
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                Program.PrintBoardWithRenderer(1, board, null);
+            });
+        }
+
+        [TestMethod]
+        public void ApplyConfigurationToRendererHandlesNullRenderer()
+        {
+            var config = Program.CreateDefaultConfiguration();
+            
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                Program.ApplyConfigurationToRenderer(null, config);
+            });
+        }
+
+        [TestMethod]
+        public void ApplyConfigurationToRendererHandlesNullConfig()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                Program.ApplyConfigurationToRenderer(renderer, null);
+            });
+        }
+
+        [TestMethod]
+        public void CreateRendererWithConfigurationReturnsValidRenderer()
+        {
+            var renderer = Program.CreateRendererWithConfiguration();
+            
+            Assert.IsNotNull(renderer);
+            Assert.AreEqual(500, renderer.GetAnimationDelay());
+        }
+
+        [TestMethod]
+        public void RunGameWithRendererHandlesExceptions()
+        {
+            try
+            {
+                Program.RunGameWithRenderer(5, 5, 1);
+                Assert.IsTrue(true); // Should complete without throwing unhandled exceptions
+            }
+            catch
+            {
+                Assert.Fail("RunGameWithRenderer should handle exceptions gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void GameConfigurationStyleEnumHasAllValues()
+        {
+            Assert.IsTrue(Enum.IsDefined(typeof(VisualStyle), VisualStyle.Classic));
+            Assert.IsTrue(Enum.IsDefined(typeof(VisualStyle), VisualStyle.Modern));
+            Assert.IsTrue(Enum.IsDefined(typeof(VisualStyle), VisualStyle.Minimal));
+        }
+
+        [TestMethod]
+        public void ApplyConfigurationToRendererHandlesDifferentStyles()
+        {
+            var renderer = new ConsoleRenderer();
+            var config = new GameConfiguration { Style = VisualStyle.Classic };
+            
+            try
+            {
+                Program.ApplyConfigurationToRenderer(renderer, config);
+                Assert.IsTrue(true); // Should complete without exceptions
+            }
+            catch
+            {
+                Assert.Fail("ApplyConfigurationToRenderer should handle different styles");
+            }
+            
+            config.Style = VisualStyle.Minimal;
+            try
+            {
+                Program.ApplyConfigurationToRenderer(renderer, config);
+                Assert.IsTrue(true); // Should complete without exceptions
+            }
+            catch
+            {
+                Assert.Fail("ApplyConfigurationToRenderer should handle Minimal style");
             }
         }
 
