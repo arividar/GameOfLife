@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GameOfLife
@@ -15,6 +17,8 @@ namespace GameOfLife
         private Encoding _originalEncoding;
         private int _animationDelay = 500; // Default 500ms delay for smooth rendering
         private GenerationCounterPosition _generationCounterPosition = GenerationCounterPosition.Top; // Default to top position
+        private bool _useUnicodeCharacters = true; // Default to Unicode, fallback to ASCII if needed
+        private bool _useAnsiColors = true; // Default to ANSI colors, fallback to plain text if needed
 
         public void InitializeConsole()
         {
@@ -26,6 +30,9 @@ namespace GameOfLife
                     _originalCursorVisible = Console.CursorVisible;
                 }
                 _originalEncoding = Console.OutputEncoding;
+                
+                // Detect terminal capabilities
+                DetectTerminalCapabilities();
                 
                 // Set UTF-8 encoding for Unicode support
                 SetEncoding();
@@ -40,6 +47,9 @@ namespace GameOfLife
             {
                 // Handle case where console initialization fails
                 // This might happen on some terminals or when output is redirected
+                // Fallback to safe ASCII mode
+                _useUnicodeCharacters = false;
+                _useAnsiColors = false;
             }
         }
 
@@ -58,6 +68,79 @@ namespace GameOfLife
             {
                 // Handle case where console restoration fails
                 // This might happen on some terminals or when output is redirected
+            }
+        }
+
+        public void DetectTerminalCapabilities()
+        {
+            try
+            {
+                // Check if we're running in a terminal that supports Unicode and ANSI colors
+                _useUnicodeCharacters = CanUseUnicodeCharacters();
+                _useAnsiColors = CanUseAnsiColors();
+            }
+            catch (Exception)
+            {
+                // If detection fails, use safe fallback
+                _useUnicodeCharacters = false;
+                _useAnsiColors = false;
+            }
+        }
+
+        public bool CanUseUnicodeCharacters()
+        {
+            try
+            {
+                // Test if console supports UTF-8 encoding
+                if (Console.OutputEncoding.EncodingName.Contains("UTF-8") || 
+                    Console.OutputEncoding.EncodingName.Contains("Unicode"))
+                {
+                    return true;
+                }
+
+                // Check for common environment variables indicating Unicode support
+                string term = Environment.GetEnvironmentVariable("TERM") ?? "";
+                string termProgram = Environment.GetEnvironmentVariable("TERM_PROGRAM") ?? "";
+                
+                // Common terminals that support Unicode
+                return term.Contains("xterm") || 
+                       term.Contains("screen") || 
+                       term.Contains("tmux") || 
+                       termProgram.Contains("iTerm") ||
+                       termProgram.Contains("Terminal") ||
+                       termProgram.Contains("vscode") ||
+                       OperatingSystem.IsWindows(); // Windows Terminal generally supports Unicode
+            }
+            catch (Exception)
+            {
+                return false; // Safe fallback
+            }
+        }
+
+        public bool CanUseAnsiColors()
+        {
+            try
+            {
+                // Check for environment variables indicating color support
+                string term = Environment.GetEnvironmentVariable("TERM") ?? "";
+                string colorTerm = Environment.GetEnvironmentVariable("COLORTERM") ?? "";
+                
+                // Disable colors if NO_COLOR environment variable is set
+                if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR")))
+                {
+                    return false;
+                }
+
+                // Common terminals that support ANSI colors
+                return term.Contains("color") || 
+                       term.Contains("xterm") || 
+                       term.Contains("screen") || 
+                       !string.IsNullOrEmpty(colorTerm) ||
+                       OperatingSystem.IsWindows(); // Modern Windows supports ANSI
+            }
+            catch (Exception)
+            {
+                return false; // Safe fallback
             }
         }
 
@@ -182,27 +265,27 @@ namespace GameOfLife
 
         public string GetAliveCellCharacter()
         {
-            return "█";
+            return _useUnicodeCharacters ? "█" : "O";
         }
 
         public string GetDeadCellCharacter()
         {
-            return "·";
+            return _useUnicodeCharacters ? "·" : ".";
         }
 
         public string GetAliveCellColor()
         {
-            return "\x1b[32m";
+            return _useAnsiColors ? "\x1b[32m" : "";
         }
 
         public string GetDeadCellColor()
         {
-            return "\x1b[90m";
+            return _useAnsiColors ? "\x1b[90m" : "";
         }
 
         public string GetColorReset()
         {
-            return "\x1b[0m";
+            return _useAnsiColors ? "\x1b[0m" : "";
         }
 
         public string RenderCell(CellStatus cellStatus)
@@ -256,32 +339,32 @@ namespace GameOfLife
 
         public string GetTopLeftBorderCharacter()
         {
-            return "┌";
+            return _useUnicodeCharacters ? "┌" : "+";
         }
 
         public string GetTopRightBorderCharacter()
         {
-            return "┐";
+            return _useUnicodeCharacters ? "┐" : "+";
         }
 
         public string GetBottomLeftBorderCharacter()
         {
-            return "└";
+            return _useUnicodeCharacters ? "└" : "+";
         }
 
         public string GetBottomRightBorderCharacter()
         {
-            return "┘";
+            return _useUnicodeCharacters ? "┘" : "+";
         }
 
         public string GetHorizontalBorderCharacter()
         {
-            return "─";
+            return _useUnicodeCharacters ? "─" : "-";
         }
 
         public string GetVerticalBorderCharacter()
         {
-            return "│";
+            return _useUnicodeCharacters ? "│" : "|";
         }
 
         public (int width, int height) CalculateBorderDimensions(int boardWidth, int boardHeight)
@@ -665,6 +748,251 @@ namespace GameOfLife
             {
                 // Handle case where custom formatting fails
             }
+        }
+
+        public void SetUnicodeCharactersEnabled(bool enabled)
+        {
+            _useUnicodeCharacters = enabled;
+        }
+
+        public void SetAnsiColorsEnabled(bool enabled)
+        {
+            _useAnsiColors = enabled;
+        }
+
+        public bool GetUnicodeCharactersEnabled()
+        {
+            return _useUnicodeCharacters;
+        }
+
+        public bool GetAnsiColorsEnabled()
+        {
+            return _useAnsiColors;
+        }
+
+        public string GetPlatformInfo()
+        {
+            try
+            {
+                return $"OS: {Environment.OSVersion}, " +
+                       $"Encoding: {Console.OutputEncoding?.EncodingName ?? "Unknown"}, " +
+                       $"Unicode: {_useUnicodeCharacters}, " +
+                       $"Colors: {_useAnsiColors}";
+            }
+            catch (Exception ex)
+            {
+                return $"Platform detection failed: {ex.Message}";
+            }
+        }
+
+        public void ForceAsciiMode()
+        {
+            _useUnicodeCharacters = false;
+            _useAnsiColors = false;
+        }
+
+        public void TestUnicodeOutput()
+        {
+            try
+            {
+                Console.WriteLine($"Unicode Test: {GetAliveCellCharacter()} {GetDeadCellCharacter()} {GetTopLeftBorderCharacter()}");
+                Console.WriteLine($"Color Test: {GetAliveCellColor()}Green{GetColorReset()} {GetDeadCellColor()}Gray{GetColorReset()}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unicode/Color test failed: {ex.Message}");
+            }
+        }
+
+        public void OptimizedClearGameArea(int boardWidth, int boardHeight, int startX, int startY)
+        {
+            try
+            {
+                // Use ANSI escape sequences for more efficient clearing if available
+                if (_useAnsiColors && CanUseOptimizedClearing())
+                {
+                    // Move to start position and use ANSI sequences to clear efficiently
+                    MoveCursorToPosition(startX, startY);
+                    
+                    // Clear each row using optimized method
+                    string clearSequence = "\x1b[K"; // Clear to end of line
+                    for (int row = 0; row < boardHeight; row++)
+                    {
+                        MoveCursorToPosition(startX, startY + row);
+                        Console.Write(clearSequence);
+                    }
+                }
+                else
+                {
+                    // Fallback to space-based clearing
+                    ClearGameArea(boardWidth, boardHeight, startX, startY);
+                }
+            }
+            catch (Exception)
+            {
+                // Fallback to basic clearing if optimization fails
+                ClearGameArea(boardWidth, boardHeight, startX, startY);
+            }
+        }
+
+        public bool CanUseOptimizedClearing()
+        {
+            return _useAnsiColors && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TERM"));
+        }
+
+        public void BatchRenderCells(GameOfLifeBoard board, GameOfLifeBoard previousBoard, int startX, int startY)
+        {
+            try
+            {
+                // Build output string in memory first to minimize console I/O
+                var changes = new List<(int x, int y, string content)>();
+                
+                if (previousBoard == null)
+                {
+                    // Render all cells
+                    for (int x = 0; x < board.Width; x++)
+                    {
+                        for (int y = 0; y < board.Height; y++)
+                        {
+                            string content = RenderCell(board.GetCell(x, y));
+                            changes.Add((startX + x, startY + y, content));
+                        }
+                    }
+                }
+                else
+                {
+                    // Only render changed cells
+                    int maxWidth = Math.Max(board.Width, previousBoard.Width);
+                    int maxHeight = Math.Max(board.Height, previousBoard.Height);
+                    
+                    for (int x = 0; x < maxWidth; x++)
+                    {
+                        for (int y = 0; y < maxHeight; y++)
+                        {
+                            CellStatus currentCell = (x < board.Width && y < board.Height) ? 
+                                board.GetCell(x, y) : CellStatus.Dead;
+                            CellStatus previousCell = (x < previousBoard.Width && y < previousBoard.Height) ? 
+                                previousBoard.GetCell(x, y) : CellStatus.Dead;
+                            
+                            if (HasCellChanged(currentCell, previousCell))
+                            {
+                                string content = RenderCell(currentCell);
+                                changes.Add((startX + x, startY + y, content));
+                            }
+                        }
+                    }
+                }
+                
+                // Apply all changes in batches to reduce cursor movement
+                ApplyBatchedChanges(changes);
+            }
+            catch (Exception)
+            {
+                // Fallback to standard rendering
+                RenderBoardSmooth(board, previousBoard, startX, startY);
+            }
+        }
+
+        public void ApplyBatchedChanges(List<(int x, int y, string content)> changes)
+        {
+            try
+            {
+                // Sort changes by row then column to minimize cursor jumps
+                var sortedChanges = changes.OrderBy(c => c.y).ThenBy(c => c.x).ToList();
+                
+                int lastX = -1, lastY = -1;
+                
+                foreach (var (x, y, content) in sortedChanges)
+                {
+                    // Only move cursor if we're not already at the right position
+                    if (x != lastX + 1 || y != lastY)
+                    {
+                        MoveCursorToPosition(x, y);
+                    }
+                    
+                    Console.Write(content);
+                    lastX = x;
+                    lastY = y;
+                }
+                
+                // Ensure cursor remains hidden after batch operations
+                EnsureCursorHidden();
+            }
+            catch (Exception)
+            {
+                // If batching fails, fall back to individual writes
+                foreach (var (x, y, content) in changes)
+                {
+                    MoveCursorToPosition(x, y);
+                    Console.Write(content);
+                }
+                EnsureCursorHidden();
+            }
+        }
+
+        public void OptimizedRenderBoardWithBorder(GameOfLifeBoard board, GameOfLifeBoard previousBoard, int offsetX, int offsetY)
+        {
+            try
+            {
+                // Only redraw border if this is the first render or board size changed
+                bool needsBorderRedraw = previousBoard == null || 
+                                       board.Width != previousBoard.Width || 
+                                       board.Height != previousBoard.Height;
+                
+                if (needsBorderRedraw)
+                {
+                    DrawBorder(board.Width, board.Height, offsetX, offsetY);
+                }
+                
+                // Use optimized batch rendering for the board content
+                BatchRenderCells(board, previousBoard, offsetX + 1, offsetY + 1);
+            }
+            catch (Exception)
+            {
+                // Fallback to standard rendering
+                RenderBoardWithBorder(board, offsetX, offsetY);
+            }
+        }
+
+        public void MinimizeScreenFlicker()
+        {
+            try
+            {
+                // Techniques to reduce screen flicker
+                EnsureCursorHidden();
+                
+                // If supported, try to enable alternate screen buffer
+                if (CanUseAlternateScreen())
+                {
+                    Console.Write("\x1b[?1049h"); // Enable alternate screen
+                }
+            }
+            catch (Exception)
+            {
+                // If flicker minimization fails, continue with standard rendering
+            }
+        }
+
+        public void RestoreScreenBuffer()
+        {
+            try
+            {
+                if (CanUseAlternateScreen())
+                {
+                    Console.Write("\x1b[?1049l"); // Restore main screen
+                }
+            }
+            catch (Exception)
+            {
+                // If restoration fails, continue normally
+            }
+        }
+
+        public bool CanUseAlternateScreen()
+        {
+            // Check if terminal supports alternate screen buffer
+            string term = Environment.GetEnvironmentVariable("TERM") ?? "";
+            return _useAnsiColors && (term.Contains("xterm") || term.Contains("screen") || term.Contains("tmux"));
         }
 
     }
