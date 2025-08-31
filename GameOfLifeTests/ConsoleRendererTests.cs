@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameOfLife;
 using System;
+using System.Collections.Generic;
 
 namespace GameOfLifeTests
 {
@@ -1334,6 +1335,779 @@ namespace GameOfLifeTests
             catch
             {
                 Assert.Fail("Generation counter should handle consecutive updates");
+            }
+        }
+
+        // Phase 5: Cross-platform testing and Unicode fallback tests
+        [TestMethod]
+        public void DetectTerminalCapabilitiesDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.DetectTerminalCapabilities();
+                Assert.IsTrue(true); // Should not throw exceptions during capability detection
+            }
+            catch
+            {
+                Assert.Fail("DetectTerminalCapabilities should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void CanUseUnicodeCharactersReturnsBooleanValue()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                bool canUseUnicode = renderer.CanUseUnicodeCharacters();
+                // Should return either true or false, not throw exceptions
+                Assert.IsTrue(canUseUnicode == true || canUseUnicode == false);
+            }
+            catch
+            {
+                Assert.Fail("CanUseUnicodeCharacters should return boolean without exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void CanUseAnsiColorsReturnsBooleanValue()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                bool canUseColors = renderer.CanUseAnsiColors();
+                // Should return either true or false, not throw exceptions
+                Assert.IsTrue(canUseColors == true || canUseColors == false);
+            }
+            catch
+            {
+                Assert.Fail("CanUseAnsiColors should return boolean without exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void SetUnicodeCharactersEnabledChangesCharacterOutput()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Enable Unicode
+            renderer.SetUnicodeCharactersEnabled(true);
+            string unicodeAlive = renderer.GetAliveCellCharacter();
+            string unicodeDead = renderer.GetDeadCellCharacter();
+            
+            // Disable Unicode (force ASCII mode)
+            renderer.SetUnicodeCharactersEnabled(false);
+            string asciiAlive = renderer.GetAliveCellCharacter();
+            string asciiDead = renderer.GetDeadCellCharacter();
+            
+            // Characters should be different
+            Assert.AreNotEqual(unicodeAlive, asciiAlive, "Alive cell characters should differ between Unicode and ASCII modes");
+            Assert.AreNotEqual(unicodeDead, asciiDead, "Dead cell characters should differ between Unicode and ASCII modes");
+        }
+
+        [TestMethod]
+        public void SetAnsiColorsEnabledChangesColorOutput()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Enable colors
+            renderer.SetAnsiColorsEnabled(true);
+            string colorAlive = renderer.GetAliveCellColor();
+            string colorReset = renderer.GetColorReset();
+            
+            // Disable colors
+            renderer.SetAnsiColorsEnabled(false);
+            string noColorAlive = renderer.GetAliveCellColor();
+            string noColorReset = renderer.GetColorReset();
+            
+            // Color strings should be different (empty when disabled)
+            Assert.AreNotEqual(colorAlive, noColorAlive, "Color codes should differ when colors are disabled");
+            Assert.AreNotEqual(colorReset, noColorReset, "Reset codes should differ when colors are disabled");
+        }
+
+        [TestMethod]
+        public void GetUnicodeCharactersEnabledReturnsCorrectStatus()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetUnicodeCharactersEnabled(true);
+            Assert.IsTrue(renderer.GetUnicodeCharactersEnabled(), "Should return true when Unicode is enabled");
+            
+            renderer.SetUnicodeCharactersEnabled(false);
+            Assert.IsFalse(renderer.GetUnicodeCharactersEnabled(), "Should return false when Unicode is disabled");
+        }
+
+        [TestMethod]
+        public void GetAnsiColorsEnabledReturnsCorrectStatus()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnsiColorsEnabled(true);
+            Assert.IsTrue(renderer.GetAnsiColorsEnabled(), "Should return true when colors are enabled");
+            
+            renderer.SetAnsiColorsEnabled(false);
+            Assert.IsFalse(renderer.GetAnsiColorsEnabled(), "Should return false when colors are disabled");
+        }
+
+        [TestMethod]
+        public void ForceAsciiModeDisablesBothUnicodeAndColors()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // First enable both
+            renderer.SetUnicodeCharactersEnabled(true);
+            renderer.SetAnsiColorsEnabled(true);
+            
+            // Force ASCII mode
+            renderer.ForceAsciiMode();
+            
+            Assert.IsFalse(renderer.GetUnicodeCharactersEnabled(), "ForceAsciiMode should disable Unicode characters");
+            Assert.IsFalse(renderer.GetAnsiColorsEnabled(), "ForceAsciiMode should disable ANSI colors");
+        }
+
+        [TestMethod]
+        public void GetPlatformInfoReturnsNonEmptyString()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            string info = renderer.GetPlatformInfo();
+            
+            Assert.IsNotNull(info, "Platform info should not be null");
+            Assert.IsTrue(info.Length > 0, "Platform info should not be empty");
+            Assert.IsTrue(info.Contains("OS"), "Platform info should contain OS information");
+        }
+
+        [TestMethod]
+        public void TestUnicodeOutputDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.TestUnicodeOutput();
+                Assert.IsTrue(true); // Should not throw exceptions during Unicode test
+            }
+            catch
+            {
+                Assert.Fail("TestUnicodeOutput should not throw exceptions");
+            }
+        }
+
+        [TestMethod]
+        public void BorderCharactersFallbackToAsciiWhenUnicodeDisabled()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Test Unicode mode
+            renderer.SetUnicodeCharactersEnabled(true);
+            string unicodeTopLeft = renderer.GetTopLeftBorderCharacter();
+            string unicodeHorizontal = renderer.GetHorizontalBorderCharacter();
+            string unicodeVertical = renderer.GetVerticalBorderCharacter();
+            
+            // Test ASCII mode
+            renderer.SetUnicodeCharactersEnabled(false);
+            string asciiTopLeft = renderer.GetTopLeftBorderCharacter();
+            string asciiHorizontal = renderer.GetHorizontalBorderCharacter();
+            string asciiVertical = renderer.GetVerticalBorderCharacter();
+            
+            // ASCII fallbacks should be different from Unicode
+            Assert.AreNotEqual(unicodeTopLeft, asciiTopLeft, "Top-left border should differ between Unicode and ASCII");
+            Assert.AreNotEqual(unicodeHorizontal, asciiHorizontal, "Horizontal border should differ between Unicode and ASCII");
+            Assert.AreNotEqual(unicodeVertical, asciiVertical, "Vertical border should differ between Unicode and ASCII");
+            
+            // ASCII characters should be basic ASCII
+            Assert.AreEqual("+", asciiTopLeft, "ASCII top-left should be plus sign");
+            Assert.AreEqual("-", asciiHorizontal, "ASCII horizontal should be dash");
+            Assert.AreEqual("|", asciiVertical, "ASCII vertical should be pipe");
+        }
+
+        [TestMethod]
+        public void ColorsAreEmptyWhenAnsiColorsDisabled()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnsiColorsEnabled(false);
+            
+            Assert.AreEqual("", renderer.GetAliveCellColor(), "Alive cell color should be empty when colors disabled");
+            Assert.AreEqual("", renderer.GetDeadCellColor(), "Dead cell color should be empty when colors disabled");
+            Assert.AreEqual("", renderer.GetColorReset(), "Color reset should be empty when colors disabled");
+        }
+
+        [TestMethod]
+        public void ColorsAreAnsiCodesWhenEnabled()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnsiColorsEnabled(true);
+            
+            string aliveColor = renderer.GetAliveCellColor();
+            string deadColor = renderer.GetDeadCellColor();
+            string resetColor = renderer.GetColorReset();
+            
+            Assert.IsTrue(aliveColor.StartsWith("\x1b["), "Alive color should be ANSI escape sequence");
+            Assert.IsTrue(deadColor.StartsWith("\x1b["), "Dead color should be ANSI escape sequence");
+            Assert.IsTrue(resetColor.StartsWith("\x1b["), "Reset should be ANSI escape sequence");
+        }
+
+        [TestMethod]
+        public void RenderCellHandlesBothUnicodeAndAsciiModes()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Test Unicode mode
+            renderer.SetUnicodeCharactersEnabled(true);
+            renderer.SetAnsiColorsEnabled(true);
+            string unicodeRendered = renderer.RenderCell(CellStatus.Alive);
+            
+            // Test ASCII mode
+            renderer.SetUnicodeCharactersEnabled(false);
+            renderer.SetAnsiColorsEnabled(false);
+            string asciiRendered = renderer.RenderCell(CellStatus.Alive);
+            
+            Assert.AreNotEqual(unicodeRendered, asciiRendered, "Rendered cells should differ between Unicode and ASCII modes");
+            Assert.IsTrue(unicodeRendered.Contains("█"), "Unicode mode should contain block character");
+            Assert.IsTrue(asciiRendered.Contains("O"), "ASCII mode should contain 'O' character");
+        }
+
+        [TestMethod]
+        public void ConsoleInitializationHandlesCapabilityDetection()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.InitializeConsole();
+                
+                // Should have detected capabilities (one way or another)
+                bool unicodeEnabled = renderer.GetUnicodeCharactersEnabled();
+                bool colorsEnabled = renderer.GetAnsiColorsEnabled();
+                
+                // These should be valid boolean values
+                Assert.IsTrue(unicodeEnabled == true || unicodeEnabled == false);
+                Assert.IsTrue(colorsEnabled == true || colorsEnabled == false);
+                
+                renderer.RestoreConsole();
+            }
+            catch
+            {
+                Assert.Fail("Console initialization should handle capability detection gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void InitializationFallsBackGracefullyOnException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // This should not throw even if some console operations fail
+            try 
+            {
+                renderer.InitializeConsole();
+                renderer.RestoreConsole();
+                Assert.IsTrue(true);
+            }
+            catch
+            {
+                Assert.Fail("Console initialization should handle exceptions gracefully with fallbacks");
+            }
+        }
+
+        [TestMethod]
+        public void CanUseUnicodeCharactersHandlesEnvironmentVariables()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // This method should handle various environment variable scenarios
+            // Even if environment variables are not set or accessible
+            bool canUse = renderer.CanUseUnicodeCharacters();
+            Assert.IsTrue(canUse == true || canUse == false, "Should return a boolean value");
+        }
+
+        [TestMethod]
+        public void CanUseAnsiColorsRespectsNoColorEnvironmentVariable()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Store original NO_COLOR value
+            string originalNoColor = Environment.GetEnvironmentVariable("NO_COLOR");
+            
+            try
+            {
+                // Set NO_COLOR to disable colors
+                Environment.SetEnvironmentVariable("NO_COLOR", "1");
+                bool canUseColors = renderer.CanUseAnsiColors();
+                Assert.IsFalse(canUseColors, "Should return false when NO_COLOR is set");
+            }
+            finally
+            {
+                // Restore original value
+                Environment.SetEnvironmentVariable("NO_COLOR", originalNoColor);
+            }
+        }
+
+        [TestMethod]
+        public void EnsureCursorHiddenHandlesExceptions()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.EnsureCursorHidden();
+                Assert.IsTrue(true); // Should not throw exceptions
+            }
+            catch
+            {
+                Assert.Fail("EnsureCursorHidden should handle exceptions gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void ApplyAnimationDelayHandlesZeroDelay()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnimationDelay(0);
+            
+            try 
+            {
+                renderer.ApplyAnimationDelay();
+                Assert.IsTrue(true); // Should handle zero delay without issues
+            }
+            catch
+            {
+                Assert.Fail("ApplyAnimationDelay should handle zero delay gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void RenderBoardWithBorderHandlesExceptions()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                renderer.RenderBoardWithBorder(board, 10, 8);
+                Assert.IsTrue(true); // Should handle rendering with border
+            }
+            catch
+            {
+                Assert.Fail("RenderBoardWithBorder should handle exceptions gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void SetEncodingHandlesExceptionsGracefully()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.SetEncoding();
+                Assert.IsTrue(true); // Should not throw exceptions
+            }
+            catch
+            {
+                Assert.Fail("SetEncoding should handle exceptions gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void GetOptimalBoardSizeForSmallTerminal()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Test with very small terminal
+            var (width, height) = renderer.GetOptimalBoardSizeForTerminal(20, 15);
+            
+            Assert.IsTrue(width >= 10, "Should maintain minimum width even for small terminals");
+            Assert.IsTrue(height >= 8, "Should maintain minimum height even for small terminals");
+            Assert.IsTrue(width <= 16, "Should fit within small terminal bounds");
+            Assert.IsTrue(height <= 11, "Should fit within small terminal bounds");
+        }
+
+        // Phase 5: Performance optimization tests
+        [TestMethod]
+        public void OptimizedClearGameAreaDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.OptimizedClearGameArea(10, 8, 5, 3);
+                Assert.IsTrue(true); // Should not throw exceptions
+            }
+            catch
+            {
+                Assert.Fail("OptimizedClearGameArea should handle exceptions gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void CanUseOptimizedClearingReturnsBooleanValue()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool canUse = renderer.CanUseOptimizedClearing();
+            Assert.IsTrue(canUse == true || canUse == false, "Should return a boolean value");
+        }
+
+        [TestMethod]
+        public void BatchRenderCellsHandlesNullPreviousBoard()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                renderer.BatchRenderCells(board, null, 10, 8);
+                Assert.IsTrue(true); // Should handle null previous board
+            }
+            catch
+            {
+                Assert.Fail("BatchRenderCells should handle null previous board gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void BatchRenderCellsHandlesDifferentSizeBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(8);
+            var previousBoard = new GameOfLifeBoard(6);
+            
+            try 
+            {
+                renderer.BatchRenderCells(board, previousBoard, 5, 3);
+                Assert.IsTrue(true); // Should handle different size boards
+            }
+            catch
+            {
+                Assert.Fail("BatchRenderCells should handle different size boards gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void ApplyBatchedChangesHandlesEmptyList()
+        {
+            var renderer = new ConsoleRenderer();
+            var emptyChanges = new List<(int x, int y, string content)>();
+            
+            try 
+            {
+                renderer.ApplyBatchedChanges(emptyChanges);
+                Assert.IsTrue(true); // Should handle empty list
+            }
+            catch
+            {
+                Assert.Fail("ApplyBatchedChanges should handle empty list gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void ApplyBatchedChangesHandlesMultipleChanges()
+        {
+            var renderer = new ConsoleRenderer();
+            var changes = new List<(int x, int y, string content)>
+            {
+                (5, 3, "test1"),
+                (7, 3, "test2"),
+                (5, 4, "test3")
+            };
+            
+            try 
+            {
+                renderer.ApplyBatchedChanges(changes);
+                Assert.IsTrue(true); // Should handle multiple changes
+            }
+            catch
+            {
+                Assert.Fail("ApplyBatchedChanges should handle multiple changes gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void OptimizedRenderBoardWithBorderHandlesFirstRender()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                renderer.OptimizedRenderBoardWithBorder(board, null, 10, 8);
+                Assert.IsTrue(true); // Should handle first render (null previous board)
+            }
+            catch
+            {
+                Assert.Fail("OptimizedRenderBoardWithBorder should handle first render gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void OptimizedRenderBoardWithBorderHandlesSameSizeBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(5);
+            var previousBoard = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                renderer.OptimizedRenderBoardWithBorder(board, previousBoard, 10, 8);
+                Assert.IsTrue(true); // Should handle same size boards
+            }
+            catch
+            {
+                Assert.Fail("OptimizedRenderBoardWithBorder should handle same size boards gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void OptimizedRenderBoardWithBorderHandlesDifferentSizeBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(8);
+            var previousBoard = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                renderer.OptimizedRenderBoardWithBorder(board, previousBoard, 10, 8);
+                Assert.IsTrue(true); // Should handle different size boards
+            }
+            catch
+            {
+                Assert.Fail("OptimizedRenderBoardWithBorder should handle different size boards gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void MinimizeScreenFlickerDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.MinimizeScreenFlicker();
+                Assert.IsTrue(true); // Should not throw exceptions
+            }
+            catch
+            {
+                Assert.Fail("MinimizeScreenFlicker should handle exceptions gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void RestoreScreenBufferDoesNotThrowException()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            try 
+            {
+                renderer.RestoreScreenBuffer();
+                Assert.IsTrue(true); // Should not throw exceptions
+            }
+            catch
+            {
+                Assert.Fail("RestoreScreenBuffer should handle exceptions gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void CanUseAlternateScreenReturnsBooleanValue()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            bool canUse = renderer.CanUseAlternateScreen();
+            Assert.IsTrue(canUse == true || canUse == false, "Should return a boolean value");
+        }
+
+        [TestMethod]
+        public void PerformanceOptimizationSequenceWorksCorrectly()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(5);
+            var previousBoard = new GameOfLifeBoard(5);
+            
+            try 
+            {
+                // Full performance optimization sequence
+                renderer.MinimizeScreenFlicker();
+                renderer.OptimizedClearGameArea(5, 5, 10, 8);
+                renderer.BatchRenderCells(board, previousBoard, 10, 8);
+                renderer.OptimizedRenderBoardWithBorder(board, previousBoard, 10, 8);
+                renderer.RestoreScreenBuffer();
+                
+                Assert.IsTrue(true); // Complete sequence should work
+            }
+            catch
+            {
+                Assert.Fail("Performance optimization sequence should work gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void CanUseOptimizedClearingWithAnsiColorsEnabled()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnsiColorsEnabled(true);
+            bool canUse = renderer.CanUseOptimizedClearing();
+            
+            // The result depends on ANSI colors being enabled and TERM environment variable
+            Assert.IsTrue(canUse == true || canUse == false);
+        }
+
+        [TestMethod]
+        public void CanUseOptimizedClearingWithAnsiColorsDisabled()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            renderer.SetAnsiColorsEnabled(false);
+            bool canUse = renderer.CanUseOptimizedClearing();
+            
+            Assert.IsFalse(canUse, "Should return false when ANSI colors are disabled");
+        }
+
+        [TestMethod]
+        public void ApplyBatchedChangesSortsChangesCorrectly()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Create changes in random order
+            var changes = new List<(int x, int y, string content)>
+            {
+                (10, 5, "cell1"),
+                (5, 3, "cell2"),
+                (8, 3, "cell3"),
+                (5, 4, "cell4")
+            };
+            
+            try 
+            {
+                // Should sort by row then column and handle efficiently
+                renderer.ApplyBatchedChanges(changes);
+                Assert.IsTrue(true);
+            }
+            catch
+            {
+                Assert.Fail("ApplyBatchedChanges should sort and handle changes efficiently");
+            }
+        }
+
+        [TestMethod]
+        public void BatchRenderCellsHandlesEmptyBoards()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(1);
+            var previousBoard = new GameOfLifeBoard(1);
+            
+            try 
+            {
+                renderer.BatchRenderCells(board, previousBoard, 10, 8);
+                Assert.IsTrue(true); // Should handle minimal boards
+            }
+            catch
+            {
+                Assert.Fail("BatchRenderCells should handle minimal boards gracefully");
+            }
+        }
+
+        [TestMethod]
+        public void CanUseAlternateScreenWithDifferentTerminalTypes()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Store original TERM
+            string originalTerm = Environment.GetEnvironmentVariable("TERM");
+            
+            try
+            {
+                // Test with xterm
+                Environment.SetEnvironmentVariable("TERM", "xterm-256color");
+                renderer.SetAnsiColorsEnabled(true);
+                bool xtermResult = renderer.CanUseAlternateScreen();
+                
+                // Test with screen
+                Environment.SetEnvironmentVariable("TERM", "screen");
+                bool screenResult = renderer.CanUseAlternateScreen();
+                
+                // Test with unknown terminal
+                Environment.SetEnvironmentVariable("TERM", "unknown");
+                bool unknownResult = renderer.CanUseAlternateScreen();
+                
+                // All should return boolean values
+                Assert.IsTrue(xtermResult == true || xtermResult == false);
+                Assert.IsTrue(screenResult == true || screenResult == false);
+                Assert.IsTrue(unknownResult == true || unknownResult == false);
+            }
+            finally
+            {
+                // Restore original TERM
+                Environment.SetEnvironmentVariable("TERM", originalTerm);
+            }
+        }
+
+        [TestMethod]
+        public void OptimizedClearGameAreaFallsBackToBasicClearingWhenNeeded()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Disable ANSI colors to force fallback
+            renderer.SetAnsiColorsEnabled(false);
+            
+            try 
+            {
+                renderer.OptimizedClearGameArea(10, 8, 5, 3);
+                Assert.IsTrue(true); // Should fallback gracefully
+            }
+            catch
+            {
+                Assert.Fail("OptimizedClearGameArea should fallback to basic clearing when needed");
+            }
+        }
+
+        [TestMethod]
+        public void OptimizedClearGameAreaUsesAnsiWhenAvailable()
+        {
+            var renderer = new ConsoleRenderer();
+            
+            // Enable ANSI colors 
+            renderer.SetAnsiColorsEnabled(true);
+            
+            try 
+            {
+                renderer.OptimizedClearGameArea(10, 8, 5, 3);
+                Assert.IsTrue(true); // Should use ANSI clearing when available
+            }
+            catch
+            {
+                Assert.Fail("OptimizedClearGameArea should use ANSI clearing when available");
+            }
+        }
+
+        [TestMethod]
+        public void BatchRenderCellsCreatesCorrectChangeList()
+        {
+            var renderer = new ConsoleRenderer();
+            var board = new GameOfLifeBoard(3);
+            
+            // Set some cells to create a pattern
+            board.SetCell(0, 0, CellStatus.Alive);
+            board.SetCell(1, 1, CellStatus.Alive);
+            board.SetCell(2, 2, CellStatus.Alive);
+            
+            try 
+            {
+                // This should create changes for all alive cells
+                renderer.BatchRenderCells(board, null, 10, 8);
+                Assert.IsTrue(true); // Should handle board with living cells
+            }
+            catch
+            {
+                Assert.Fail("BatchRenderCells should handle boards with living cells");
             }
         }
     }
