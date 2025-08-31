@@ -2095,9 +2095,9 @@ namespace GameOfLifeTests
             var board = new GameOfLifeBoard(3);
             
             // Set some cells to create a pattern
-            board.SetCell(0, 0, CellStatus.Alive);
-            board.SetCell(1, 1, CellStatus.Alive);
-            board.SetCell(2, 2, CellStatus.Alive);
+            board.SetCellAlive(0, 0);
+            board.SetCellAlive(1, 1);
+            board.SetCellAlive(2, 2);
             
             try 
             {
