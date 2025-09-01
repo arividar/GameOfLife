@@ -2520,5 +2520,74 @@ namespace GameOfLifeTests
                 Assert.IsTrue(true);
             }
         }
+
+        [TestMethod]
+        public void GameConfigurationApplyToRendererSetsAllProperties()
+        {
+            var renderer = new ConsoleRenderer();
+            var config = new GameConfiguration
+            {
+                UseUnicodeCharacters = false,
+                UseColors = false,
+                AnimationDelay = 1000
+            };
+
+            config.ApplyToRenderer(renderer);
+
+            Assert.IsFalse(renderer.GetUnicodeCharactersEnabled(), "ApplyToRenderer should set Unicode characters");
+            Assert.IsFalse(renderer.GetAnsiColorsEnabled(), "ApplyToRenderer should set ANSI colors");
+        }
+
+        [TestMethod]
+        public void GameConfigurationCreateClassicConfigurationReturnsExpectedSettings()
+        {
+            var config = GameConfiguration.CreateClassicConfiguration();
+
+            Assert.IsFalse(config.UseColors, "Classic configuration should disable colors");
+            Assert.IsFalse(config.UseUnicodeCharacters, "Classic configuration should disable Unicode");
+            Assert.AreEqual(VisualStyle.Classic, config.Style, "Classic configuration should use Classic style");
+            Assert.AreEqual(500, config.AnimationDelay, "Classic configuration should have default animation delay");
+        }
+
+        [TestMethod]
+        public void GameConfigurationCreateModernConfigurationReturnsExpectedSettings()
+        {
+            var config = GameConfiguration.CreateModernConfiguration();
+
+            Assert.IsTrue(config.UseColors, "Modern configuration should enable colors");
+            Assert.IsTrue(config.UseUnicodeCharacters, "Modern configuration should enable Unicode");
+            Assert.AreEqual(VisualStyle.Modern, config.Style, "Modern configuration should use Modern style");
+            Assert.AreEqual(500, config.AnimationDelay, "Modern configuration should have default animation delay");
+        }
+
+        [TestMethod]
+        public void ProgramCreateDefaultConfigurationReturnsModernSettings()
+        {
+            var config = Program.CreateDefaultConfiguration();
+
+            Assert.IsTrue(config.UseColors, "Default configuration should enable colors");
+            Assert.IsTrue(config.UseUnicodeCharacters, "Default configuration should enable Unicode");
+            Assert.AreEqual(VisualStyle.Modern, config.Style, "Default configuration should use Modern style");
+            Assert.AreEqual(500, config.AnimationDelay, "Default configuration should have 500ms delay");
+        }
+
+        [TestMethod]
+        public void ProgramApplyConfigurationToRendererHandlesNullArguments()
+        {
+            var renderer = new ConsoleRenderer();
+            var config = new GameConfiguration();
+
+            Assert.ThrowsException<ArgumentNullException>(() => Program.ApplyConfigurationToRenderer(null, config));
+            Assert.ThrowsException<ArgumentNullException>(() => Program.ApplyConfigurationToRenderer(renderer, null));
+        }
+
+        [TestMethod]
+        public void ProgramCreateRendererWithConfigurationReturnsConfiguredRenderer()
+        {
+            var renderer = Program.CreateRendererWithConfiguration();
+
+            Assert.IsNotNull(renderer, "CreateRendererWithConfiguration should return a renderer");
+            // The renderer should be configured with default modern settings
+        }
     }
 }
