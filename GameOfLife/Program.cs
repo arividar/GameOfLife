@@ -29,6 +29,35 @@ namespace GameOfLife
         public bool UseColors { get; set; } = true;
         public bool UseUnicodeCharacters { get; set; } = true;
         public VisualStyle Style { get; set; } = VisualStyle.Modern;
+
+        public static GameConfiguration CreateClassicConfiguration()
+        {
+            return new GameConfiguration
+            {
+                UseColors = false,
+                UseUnicodeCharacters = false,
+                Style = VisualStyle.Classic,
+                AnimationDelay = 500
+            };
+        }
+
+        public static GameConfiguration CreateModernConfiguration()
+        {
+            return new GameConfiguration
+            {
+                UseColors = true,
+                UseUnicodeCharacters = true,
+                Style = VisualStyle.Modern,
+                AnimationDelay = 500
+            };
+        }
+
+        public void ApplyToRenderer(ConsoleRenderer renderer)
+        {
+            renderer.SetUnicodeCharactersEnabled(UseUnicodeCharacters);
+            renderer.SetAnsiColorsEnabled(UseColors);
+            renderer.SetAnimationDelay(AnimationDelay);
+        }
     }
     public class Program
     {
