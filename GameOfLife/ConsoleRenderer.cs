@@ -19,6 +19,7 @@ namespace GameOfLife
         private GenerationCounterPosition _generationCounterPosition = GenerationCounterPosition.Top; // Default to top position
         private bool _useUnicodeCharacters = true; // Default to Unicode, fallback to ASCII if needed
         private bool _useAnsiColors = true; // Default to ANSI colors, fallback to plain text if needed
+        private bool _manuallyConfigured = false; // Track if settings were manually configured
 
         public void InitializeConsole()
         {
@@ -31,8 +32,11 @@ namespace GameOfLife
                 }
                 _originalEncoding = Console.OutputEncoding;
                 
-                // Detect terminal capabilities
-                DetectTerminalCapabilities();
+                // Detect terminal capabilities only if not manually configured
+                if (!_manuallyConfigured)
+                {
+                    DetectTerminalCapabilities();
+                }
                 
                 // Set UTF-8 encoding for Unicode support
                 SetEncoding();
@@ -753,11 +757,13 @@ namespace GameOfLife
         public void SetUnicodeCharactersEnabled(bool enabled)
         {
             _useUnicodeCharacters = enabled;
+            _manuallyConfigured = true;
         }
 
         public void SetAnsiColorsEnabled(bool enabled)
         {
             _useAnsiColors = enabled;
+            _manuallyConfigured = true;
         }
 
         public bool GetUnicodeCharactersEnabled()
